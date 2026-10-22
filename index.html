@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/mobile.css">
   <link rel="stylesheet" href="css/amazon.css">
+  <link rel="stylesheet" href="css/auth-mobile.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
@@ -210,9 +211,9 @@
     <a href="#" class="nav-item" data-view="pedidos"><i class="fas fa-box"></i><span>Pedidos</span></a>
     <a href="#" class="nav-item" data-view="perfil"><i class="fas fa-user"></i><span>Mi Perfil</span></a>
   </nav>
-  <div id="authModal" class="modal hidden"><div class="modal-content"><button class="close-btn" id="closeAuth"><i class="fas fa-times"></i></button><div class="auth-tabs"><button class="tab active" data-tab="login">Iniciar sesión</button><button class="tab" data-tab="register">Registrarse</button></div>
-    <form id="loginForm" class="auth-form"><div class="form-group"><label>Correo electrónico</label><input type="email" id="loginEmail" required placeholder="correo@ejemplo.com" autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false"></div><div class="form-group"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password"></div><p class="form-error hidden" id="loginError"></p><button type="submit" class="btn btn-primary btn-block" id="btnLoginSubmit">Entrar</button><div class="auth-divider">o continúa con</div><button type="button" class="btn-google" id="btnGoogleLogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
-    <form id="registerForm" class="auth-form hidden"><div class="form-group"><label>Nombre completo</label><input type="text" id="regName" required placeholder="Tu nombre" autocomplete="name"></div><div class="form-group"><label>Correo electrónico</label><input type="email" id="regEmail" required placeholder="correo@ejemplo.com" autocomplete="email"></div><div class="form-group"><label>Contraseña</label><input type="password" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div><div class="form-group"><label>Confirmar contraseña</label><input type="password" id="regPassword2" required placeholder="Repite la contraseña" autocomplete="new-password"></div><button type="submit" class="btn btn-primary btn-block">Crear cuenta</button><div class="auth-divider">o regístrate con</div><button type="button" class="btn-google" id="btnGoogleRegister"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
+  <div id="authModal" class="modal hidden"><div class="modal-content"><button type="button" class="close-btn" id="closeAuth"><i class="fas fa-times"></i></button><div class="auth-tabs"><button type="button" class="tab active" data-tab="login">Iniciar sesión</button><button type="button" class="tab" data-tab="register">Registrarse</button></div>
+    <form id="loginForm" class="auth-form" novalidate autocomplete="on"><div class="form-group"><label>Correo electrónico</label><input type="email" id="loginEmail" required placeholder="correo@ejemplo.com" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false"></div><div class="form-group"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password"></div><p class="form-error hidden" id="loginError"></p><button type="submit" class="btn btn-primary btn-block" id="btnLoginSubmit">Entrar</button><div class="auth-divider">o continúa con</div><button type="button" class="btn-google" id="btnGoogleLogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
+    <form id="registerForm" class="auth-form hidden" novalidate><div class="form-group"><label>Nombre completo</label><input type="text" id="regName" required placeholder="Tu nombre" autocomplete="name"></div><div class="form-group"><label>Correo electrónico</label><input type="email" id="regEmail" required placeholder="correo@ejemplo.com" autocomplete="email" autocapitalize="off"></div><div class="form-group"><label>Contraseña</label><input type="password" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div><div class="form-group"><label>Confirmar contraseña</label><input type="password" id="regPassword2" required placeholder="Repite la contraseña" autocomplete="new-password"></div><button type="submit" class="btn btn-primary btn-block">Crear cuenta</button><div class="auth-divider">o regístrate con</div><button type="button" class="btn-google" id="btnGoogleRegister"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
   </div></div>
   <div id="sheetCategory" class="bottom-sheet hidden"><div class="sheet-handle"></div><h3>Categoría</h3><div class="sheet-options" id="categoryOptions">
     <button type="button" data-value="" class="sheet-opt active">Todas</button>
@@ -228,9 +229,9 @@
     <button type="button" data-value="precio-desc" class="sheet-opt">Precio: mayor a menor</button>
     <button type="button" data-value="nuevos" class="sheet-opt">Más nuevos</button>
   </div></div>
-  <div id="productModal" class="modal hidden"><div class="modal-content modal-product"><button class="close-btn" id="closeProduct"><i class="fas fa-times"></i></button><div id="productDetail" class="product-detail-sheet"></div></div></div>
-  <div id="wishlistPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Lista de deseos</h2><button class="close-btn" id="closeWishlist"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="wishlistItems"></div></div>
-  <div id="checkoutPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Finalizar compra</h2><button class="close-btn" id="closeCheckout"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="checkoutBody"></div></div>
+  <div id="productModal" class="modal hidden"><div class="modal-content modal-product"><button type="button" class="close-btn" id="closeProduct"><i class="fas fa-times"></i></button><div id="productDetail" class="product-detail-sheet"></div></div></div>
+  <div id="wishlistPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Lista de deseos</h2><button type="button" class="close-btn" id="closeWishlist"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="wishlistItems"></div></div>
+  <div id="checkoutPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Finalizar compra</h2><button type="button" class="close-btn" id="closeCheckout"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="checkoutBody"></div></div>
   <div id="toastContainer"></div><div id="overlay" class="overlay hidden"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
@@ -240,6 +241,7 @@
   <script src="js/app.js"></script>
   <script src="js/features.js"></script>
   <script src="js/ui-patch.js"></script>
+  <script src="js/login-fix.js"></script>
   <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});});}</script>
 </body>
 </html>
