@@ -1,4 +1,4 @@
-/* Mi Vitrina UI patch — modal Amazon + bottom sheets */
+/* Mi Vitrina UI patch — modal Amazon + bottom sheets + categorías + login */
 (function () {
   function openSheet(id) {
     const el = document.getElementById(id);
@@ -15,6 +15,15 @@
   }
   window.openSheet = openSheet;
   window.closeSheets = closeSheets;
+
+  function applyCategory(cat) {
+    const sel = document.getElementById('categoryFilter');
+    if (sel) sel.value = cat || '';
+    const lab = document.getElementById('categoryLabel');
+    if (lab) lab.textContent = cat || 'Categoría';
+    if (typeof switchView === 'function') switchView('inicio');
+    if (typeof renderProducts === 'function') renderProducts();
+  }
 
   window.openProductModal = function (id) {
     const product = (window.State && State.products || []).find((p) => p.id === id);
@@ -38,6 +47,7 @@
         : product.old_price
           ? '$' + product.old_price
           : '';
+    const inStock = product.stock == null || product.stock > 0;
     detail.innerHTML = `
       <div class="pds-img-wrap">
         <img src="${product.image || 'https://via.placeholder.com/400?text=Producto'}" alt="${product.name}"
@@ -48,7 +58,10 @@
         <a class="pds-store" href="${store.slug ? '/tienda/' + store.slug : '#'}"><i class="fas fa-store"></i> ${store.name || 'Tienda'}</a>
         <div class="pds-price">${price}${oldP ? `<small>${oldP}</small>` : ''}${discount ? `<span class="badge-discount">-${discount}%</span>` : ''}</div>
         <p class="pds-desc">${product.description || 'Sin descripción'}</p>
-        <div class="pds-meta"><span><i class="fas fa-boxes"></i> Stock: ${stock}</span>${cat ? `<span><i class="fas fa-tag"></i> ${cat}</span>` : ''}</div>
+        <div class="pds-meta">
+          <span style="color:${inStock ? 'var(--success,#28a745)' : 'var(--danger)'}"><i class="fas fa-box"></i> ${inStock ? 'En stock' : 'Agotado'}: ${stock}</span>
+          ${cat ? `<span><i class="fas fa-tag"></i> ${cat}</span>` : ''}
+        </div>
         <div class="pds-qty">
           <label>Cantidad</label>
           <div class="pds-qty-ctrl">
@@ -100,6 +113,60 @@
     document.getElementById('overlay')?.classList.remove('hidden');
   };
 
+  function wireLoginForm() {
+    const form = document.getElementById('loginForm');
+    if (!form || form._patched) return;
+    form._patched = true;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      const errEl = document.getElementById('loginError');
+      const btn = document.getElementById('btnLoginSubmit') || form.querySelector('button[type="submit"]');
+      const email = (document.getElementById('loginEmail')?.value || '').trim().toLowerCase();
+      const password = document.getElementById('loginPassword')?.value || '';
+      if (errEl) { errEl.textContent = ''; errEl.classList.add('hidden'); }
+      if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
+      try {
+        await Auth.login(email, password);
+        if (typeof closeAuthModal === 'function') closeAuthModal();
+        if (typeof updateAuthUI === 'function') updateAuthUI();
+        if (typeof toast === 'function') toast('Bienvenido', 'success');
+      } catch (err) {
+        const msg = err.message || 'Error al iniciar sesión';
+        if (errEl) {
+          errEl.textContent = msg;
+          errEl.classList.remove('hidden');
+        }
+        if (typeof toast === 'function') toast(msg, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+      }
+    }, true);
+  }
+
+  function wireCategories() {
+    document.querySelectorAll('.home-cat[data-cat]').forEach((btn) => {
+      btn.addEventListener('click', () => applyCategory(btn.dataset.cat));
+    });
+    document.querySelectorAll('.home-cat[data-view]').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (typeof switchView === 'function') switchView(btn.dataset.view);
+      });
+    });
+    document.querySelectorAll('.cat-card[data-cat]').forEach((btn) => {
+      btn.addEventListener('click', () => applyCategory(btn.dataset.cat));
+    });
+    document.getElementById('btnHeroOffers')?.addEventListener('click', () => {
+      const sort = document.getElementById('sortFilter');
+      if (sort) sort.value = 'precio-asc';
+      const lab = document.getElementById('sortLabel');
+      if (lab) lab.textContent = 'Ofertas';
+      if (typeof switchView === 'function') switchView('inicio');
+      if (typeof renderProducts === 'function') renderProducts();
+    });
+  }
+
   function wireSheets() {
     document.getElementById('btnOpenCategory')?.addEventListener('click', () => openSheet('sheetCategory'));
     document.getElementById('btnOpenSort')?.addEventListener('click', () => openSheet('sheetSort'));
@@ -138,9 +205,15 @@
     }
   }
 
+  function boot() {
+    wireSheets();
+    wireCategories();
+    wireLoginForm();
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(wireSheets, 100));
+    document.addEventListener('DOMContentLoaded', () => setTimeout(boot, 120));
   } else {
-    setTimeout(wireSheets, 100);
+    setTimeout(boot, 120);
   }
 })();
