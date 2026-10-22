@@ -1,6 +1,6 @@
 /**
  * Autenticación - Mi Vitrina
- * Supabase Auth real + fallback DEMO.
+ * Supabase Auth (email + Google) + fallback DEMO.
  */
 
 const Auth = {
@@ -37,7 +37,7 @@ const Auth = {
     try {
       profile = await DataService.getProfile(supabaseUser.id);
     } catch (_) {}
-    const name = profile?.full_name || supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0];
+    const name = profile?.full_name || supabaseUser.user_metadata?.full_name || supabaseUser.user_metadata?.name || supabaseUser.email?.split('@')[0] || 'Usuario';
     let role = profile?.role || 'customer';
     if (supabaseUser.email?.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase()) {
       role = 'admin';
@@ -50,8 +50,11 @@ const Auth = {
       address: profile?.address || '',
       age: profile?.age || null,
       notes: profile?.notes || '',
-      avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`,
+      avatar: profile?.avatar_url || supabaseUser.user_metadata?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`,
       role,
+      referral_code: profile?.referral_code || null,
+      referred_by: profile?.referred_by || null,
+      is_manager: profile?.is_manager || role === 'manager',
       email_verified: supabaseUser.email_confirmed_at != null,
     };
   },
@@ -157,6 +160,22 @@ const Auth = {
     return this.currentUser;
   },
 
+  /** Login / registro con Google (OAuth) */
+  async loginWithGoogle() {
+    if (CONFIG.DEMO_MODE || !window.sb) {
+      throw new Error('Google login no disponible en modo demo. Usa email/contraseña.');
+    }
+    const { data, error } = await sb.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+        queryParams: { access_type: 'offline', prompt: 'consent' },
+      },
+    });
+    if (error) throw new Error(error.message || 'Error al conectar con Google');
+    return data;
+  },
+
   async updateProfile(updates) {
     if (!this.currentUser) throw new Error('No hay sesión');
     const payload = {
@@ -210,6 +229,10 @@ const Auth = {
 
   isSeller() {
     return this.currentUser?.role === 'seller' || this.isAdmin();
+  },
+
+  isManager() {
+    return this.currentUser?.is_manager || this.currentUser?.role === 'manager' || this.isAdmin();
   },
 
   getUser() {
