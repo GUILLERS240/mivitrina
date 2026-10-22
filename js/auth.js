@@ -1,6 +1,6 @@
 /**
- * Autenticación - MercadoPlus v0.1
- * Soporta modo DEMO (localStorage) y Supabase Auth real.
+ * Autenticación - Mi Vitrina
+ * Supabase Auth real + fallback DEMO.
  */
 
 const Auth = {
@@ -9,19 +9,15 @@ const Auth = {
   async init() {
     if (CONFIG.DEMO_MODE || !window.sb) {
       const stored = localStorage.getItem('mp_user');
-      if (stored) {
-        this.currentUser = JSON.parse(stored);
-      }
+      if (stored) this.currentUser = JSON.parse(stored);
       return this.currentUser;
     }
 
-    // Supabase real
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
       this.currentUser = await this._mapUser(session.user);
     }
 
-    // Escuchar cambios de sesión
     sb.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         this.currentUser = await this._mapUser(session.user);
@@ -37,24 +33,31 @@ const Auth = {
   },
 
   async _mapUser(supabaseUser) {
-    const profile = await DataService.getProfile(supabaseUser.id);
+    let profile = null;
+    try {
+      profile = await DataService.getProfile(supabaseUser.id);
+    } catch (_) {}
+    const name = profile?.full_name || supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0];
+    let role = profile?.role || 'customer';
+    if (supabaseUser.email?.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase()) {
+      role = 'admin';
+    }
     return {
       id: supabaseUser.id,
       email: supabaseUser.email,
-      name: profile?.full_name || supabaseUser.user_metadata?.full_name || supabaseUser.email.split('@')[0],
+      name,
       phone: profile?.phone || '',
       address: profile?.address || '',
       age: profile?.age || null,
       notes: profile?.notes || '',
-      avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(profile?.full_name || 'U')}&background=0D8ABC&color=fff`,
-      role: profile?.role || 'customer', // customer | seller | admin
+      avatar: profile?.avatar_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0D8ABC&color=fff`,
+      role,
       email_verified: supabaseUser.email_confirmed_at != null,
     };
   },
 
   async register(email, password, fullName) {
     if (CONFIG.DEMO_MODE || !window.sb) {
-      // Demo: crear usuario local
       const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
       if (users.find(u => u.email === email)) {
         throw new Error('Este correo ya está registrado.');
@@ -62,7 +65,7 @@ const Auth = {
       const user = {
         id: 'user-' + Date.now(),
         email,
-        password, // solo en demo
+        password,
         name: fullName,
         phone: '',
         address: '',
@@ -70,18 +73,16 @@ const Auth = {
         notes: '',
         avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}&background=0D8ABC&color=fff`,
         role: email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase() ? 'admin' : 'customer',
-        email_verified: true, // en demo se verifica automáticamente
+        email_verified: true,
       };
       users.push(user);
       localStorage.setItem('mp_users', JSON.stringify(users));
-      // Auto login
       const { password: _, ...safeUser } = user;
       this.currentUser = safeUser;
       localStorage.setItem('mp_user', JSON.stringify(safeUser));
       return safeUser;
     }
 
-    // Supabase real
     const { data, error } = await sb.auth.signUp({
       email,
       password,
@@ -90,17 +91,23 @@ const Auth = {
         emailRedirectTo: window.location.origin,
       },
     });
-    if (error) throw error;
+    if (error) throw new Error(error.message || 'Error al registrarse');
 
-    // Crear perfil
     if (data.user) {
       const role = email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase() ? 'admin' : 'customer';
-      await sb.from('profiles').upsert({
-        id: data.user.id,
-        full_name: fullName,
-        email,
-        role,
-      });
+      try {
+        await sb.from('profiles').upsert({
+          id: data.user.id,
+          full_name: fullName,
+          email,
+          role,
+        });
+      } catch (e) {
+        console.warn('Perfil:', e);
+      }
+      if (data.session) {
+        this.currentUser = await this._mapUser(data.user);
+      }
     }
 
     return data;
@@ -112,18 +119,31 @@ const Auth = {
       const user = users.find(u => u.email === email && u.password === password);
       if (!user) throw new Error('Correo o contraseña incorrectos.');
       const { password: _, ...safeUser } = user;
-      // Si es el admin email, forzar role admin
-      if (email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase()) {
-        safeUser.role = 'admin';
-      }
+      if (email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase()) safeUser.role = 'admin';
       this.currentUser = safeUser;
       localStorage.setItem('mp_user', JSON.stringify(safeUser));
       return safeUser;
     }
 
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      const msg = error.message || 'Error al iniciar sesión';
+      if (msg.toLowerCase().includes('invalid')) throw new Error('Correo o contraseña incorrectos.');
+      if (msg.toLowerCase().includes('confirm')) throw new Error('Debes verificar tu correo antes de entrar.');
+      throw new Error(msg);
+    }
     this.currentUser = await this._mapUser(data.user);
+    if (email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase()) {
+      this.currentUser.role = 'admin';
+      try {
+        await sb.from('profiles').upsert({
+          id: data.user.id,
+          email,
+          role: 'admin',
+          full_name: this.currentUser.name,
+        });
+      } catch (_) {}
+    }
     return this.currentUser;
   },
 
