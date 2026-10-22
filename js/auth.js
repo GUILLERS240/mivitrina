@@ -91,7 +91,13 @@ const Auth = {
         emailRedirectTo: window.location.origin,
       },
     });
-    if (error) throw new Error(error.message || 'Error al registrarse');
+    if (error) {
+      const msg = error.message || 'Error al registrarse';
+      if (msg.toLowerCase().includes('already') || msg.toLowerCase().includes('registered')) {
+        throw new Error('Este correo ya está registrado. Intenta iniciar sesión.');
+      }
+      throw new Error(msg);
+    }
 
     if (data.user) {
       const role = email.toLowerCase() === CONFIG.ADMIN_EMAIL.toLowerCase() ? 'admin' : 'customer';
@@ -128,8 +134,12 @@ const Auth = {
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     if (error) {
       const msg = error.message || 'Error al iniciar sesión';
-      if (msg.toLowerCase().includes('invalid')) throw new Error('Correo o contraseña incorrectos.');
-      if (msg.toLowerCase().includes('confirm')) throw new Error('Debes verificar tu correo antes de entrar.');
+      if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credentials')) {
+        throw new Error('Correo o contraseña incorrectos.');
+      }
+      if (msg.toLowerCase().includes('confirm') || msg.toLowerCase().includes('verify')) {
+        throw new Error('Debes verificar tu correo antes de entrar. Revisa tu bandeja.');
+      }
       throw new Error(msg);
     }
     this.currentUser = await this._mapUser(data.user);
@@ -144,6 +154,38 @@ const Auth = {
         });
       } catch (_) {}
     }
+    return this.currentUser;
+  },
+
+  async updateProfile(updates) {
+    if (!this.currentUser) throw new Error('No hay sesión');
+    const payload = {
+      full_name: updates.name ?? this.currentUser.name,
+      phone: updates.phone ?? this.currentUser.phone,
+      age: updates.age ? Number(updates.age) : this.currentUser.age,
+      address: updates.address ?? this.currentUser.address,
+      notes: updates.notes ?? this.currentUser.notes,
+    };
+    if (CONFIG.DEMO_MODE || !window.sb) {
+      Object.assign(this.currentUser, {
+        name: payload.full_name,
+        phone: payload.phone,
+        age: payload.age,
+        address: payload.address,
+        notes: payload.notes,
+      });
+      localStorage.setItem('mp_user', JSON.stringify(this.currentUser));
+      return this.currentUser;
+    }
+    await DataService.updateProfile(this.currentUser.id, payload);
+    this.currentUser = {
+      ...this.currentUser,
+      name: payload.full_name,
+      phone: payload.phone,
+      age: payload.age,
+      address: payload.address,
+      notes: payload.notes,
+    };
     return this.currentUser;
   },
 
