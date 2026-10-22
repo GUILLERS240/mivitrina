@@ -1,0 +1,33 @@
+# supabase.me — Especificaciones de Supabase para MercadoPlus / Mi Vitrina
+# Este archivo es para que otra IA (o desarrollador) sepa exactamente qué está
+# configurado y qué debe respetar / mejorar.
+
+## Proyecto
+- Nombre: Mi Vitrina
+- Project ID / Ref: sdaruvqjvykrrbywiuuf
+- Región: us-east-1
+- URL: https://sdaruvqjvykrrbywiuuf.supabase.co
+- Anon key (legacy JWT): ya está en js/config.js
+- Auth con Google: NO TOCAR. Ya estaba configurado y se debe mantener.
+
+## Qué se hizo (2026-10-22)
+1. Se eliminaron TODAS las tablas del schema `public` anteriores.
+2. Se dejó intacto `auth.*` y la configuración de proveedores (incluido Google).
+3. Se aplicó el schema limpio de MercadoPlus v0.1 (tablas + RLS + trigger de perfil).
+
+## Tablas actuales (public)
+profiles, stores, products, orders, order_items, seller_requests, conversations, messages, notifications
+
+## Roles
+- customer (default)
+- seller
+- admin → solo guillers240@gmail.com
+
+## Trigger
+public.handle_new_user() crea perfil y asigna admin si email es guillers240@gmail.com
+
+## Frontend
+DEMO_MODE = false, credenciales de Mi Vitrina
+
+## Mejoras pendientes
+Ver archivo completo en el repo.
