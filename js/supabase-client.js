@@ -10,6 +10,12 @@ function initSupabase() {
   }
   try {
     supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage,
+      },
       realtime: { params: { eventsPerSecond: 10 } },
     });
     console.log('[Mi Vitrina] Supabase conectado');
@@ -24,7 +30,6 @@ const sb = initSupabase();
 window.sb = sb;
 
 const DataService = {
-  // ---- UPLOAD IMAGEN ----
   async uploadImage(file, folder = 'products') {
     if (!sb) throw new Error('Sin conexión a Supabase');
     if (!file || !file.type.startsWith('image/')) throw new Error('Selecciona una imagen válida');
@@ -47,7 +52,6 @@ const DataService = {
     return data.publicUrl;
   },
 
-  // ---- PRODUCTOS ----
   async getProducts(filters = {}) {
     if (!sb) return [];
     let query = sb.from('products').select('*, stores(name, logo, slug)').eq('active', true);
@@ -89,7 +93,6 @@ const DataService = {
     if (error) throw error;
   },
 
-  // ---- TIENDAS ----
   async getStores() {
     if (!sb) return [];
     const { data, error } = await sb.from('stores').select('*').eq('active', true).order('name');
@@ -111,7 +114,6 @@ const DataService = {
     return data;
   },
 
-  // ---- PEDIDOS ----
   async getOrders(userId) {
     if (!sb) return [];
     const { data, error } = await sb
@@ -120,7 +122,6 @@ const DataService = {
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
     if (error) throw error;
-    // Normalizar items para la UI
     return (data || []).map(o => ({
       ...o,
       items: (o.order_items || []).map(it => ({
@@ -158,7 +159,6 @@ const DataService = {
     const { error: itemsErr } = await sb.from('order_items').insert(items);
     if (itemsErr) throw itemsErr;
 
-    // Notificar al dueño de la tienda
     if (storeId) {
       const { data: store } = await sb.from('stores').select('owner_id').eq('id', storeId).single();
       if (store?.owner_id) {
@@ -174,7 +174,6 @@ const DataService = {
     return order;
   },
 
-  // ---- PERFIL ----
   async getProfile(userId) {
     if (!sb) return null;
     const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
@@ -189,7 +188,6 @@ const DataService = {
     return data;
   },
 
-  // ---- SOLICITUD VENDEDOR ----
   async requestSeller(userId, data) {
     if (!sb) throw new Error('Sin Supabase');
     const { data: req, error } = await sb.from('seller_requests').upsert({
@@ -208,10 +206,8 @@ const DataService = {
     return data;
   },
 
-  // ---- MENSAJES ----
   async getConversations(userId) {
     if (!sb) return [];
-    // Como cliente
     const { data: asUser } = await sb.from('conversations')
       .select('*, stores(name, logo), messages(content, created_at, read, sender_id)')
       .eq('user_id', userId)
@@ -281,7 +277,6 @@ const DataService = {
       .subscribe();
   },
 
-  // ---- NOTIFICACIONES ----
   async getNotifications(userId) {
     if (!sb) return [];
     const { data, error } = await sb.from('notifications')
@@ -295,7 +290,6 @@ const DataService = {
     await sb.from('notifications').update({ read: true }).eq('id', id);
   },
 
-  // ---- PUSH ----
   async savePushSubscription(userId, sub) {
     if (!sb || !sub) return;
     const json = typeof sub.toJSON === 'function' ? sub.toJSON() : sub;
