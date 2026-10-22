@@ -1,4 +1,4 @@
-/* Mi Vitrina UI patch — modal Amazon + bottom sheets + categorías + login */
+/* Mi Vitrina UI patch — modal + sheets + categorías + login + wishlist/checkout */
 (function () {
   function openSheet(id) {
     const el = document.getElementById(id);
@@ -50,6 +50,7 @@
     const inStock = product.stock == null || product.stock > 0;
     detail.innerHTML = `
       <div class="pds-img-wrap">
+        <button type="button" class="pds-wish" id="detailWish" aria-label="Deseos"><i class="fas fa-heart"></i></button>
         <img src="${product.image || 'https://via.placeholder.com/400?text=Producto'}" alt="${product.name}"
           onerror="this.src='https://via.placeholder.com/400?text=Producto'">
       </div>
@@ -78,10 +79,18 @@
       </div>`;
     let qty = 1;
     const qtyEl = () => document.getElementById('detailQty');
-    document.getElementById('qtyMinus').onclick = () => {
-      if (qty > 1) { qty--; qtyEl().textContent = qty; }
-    };
+    document.getElementById('qtyMinus').onclick = () => { if (qty > 1) { qty--; qtyEl().textContent = qty; } };
     document.getElementById('qtyPlus').onclick = () => { qty++; qtyEl().textContent = qty; };
+    const wishBtn = document.getElementById('detailWish');
+    if (wishBtn && window.Wishlist) {
+      if (Wishlist.has(id)) wishBtn.classList.add('active');
+      wishBtn.onclick = (e) => {
+        e.stopPropagation();
+        const on = Wishlist.toggle(id);
+        wishBtn.classList.toggle('active', on);
+        if (typeof toast === 'function') toast(on ? 'Añadido a deseos' : 'Quitado de deseos');
+      };
+    }
     document.getElementById('detailAddCart').onclick = () => {
       if (typeof addToCart === 'function') addToCart(id, qty);
       if (typeof closeProductModal === 'function') closeProductModal();
@@ -133,10 +142,7 @@
         if (typeof toast === 'function') toast('Bienvenido', 'success');
       } catch (err) {
         const msg = err.message || 'Error al iniciar sesión';
-        if (errEl) {
-          errEl.textContent = msg;
-          errEl.classList.remove('hidden');
-        }
+        if (errEl) { errEl.textContent = msg; errEl.classList.remove('hidden'); }
         if (typeof toast === 'function') toast(msg, 'error');
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
@@ -209,6 +215,51 @@
     wireSheets();
     wireCategories();
     wireLoginForm();
+    document.getElementById('orderFilterTabs')?.querySelectorAll('.order-tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        document.getElementById('orderFilterTabs').querySelectorAll('.order-tab').forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        const f = tab.dataset.filter || 'all';
+        document.getElementById('ordersList')?.querySelectorAll('.order-card').forEach((card) => {
+          const st = card.dataset.status || '';
+          let show = f === 'all';
+          if (f === 'pendiente') show = ['pendiente','aceptado','en_proceso'].includes(st);
+          if (f === 'enviado') show = st === 'enviado';
+          if (f === 'entregado') show = st === 'entregado';
+          card.style.display = show ? '' : 'none';
+        });
+      });
+    });
+    document.getElementById('menuWishlist')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (typeof openWishlist === 'function') openWishlist();
+    });
+    document.getElementById('closeWishlist')?.addEventListener('click', () => {
+      document.getElementById('wishlistPanel')?.classList.add('hidden');
+      document.getElementById('overlay')?.classList.add('hidden');
+    });
+    document.getElementById('closeCheckout')?.addEventListener('click', () => {
+      document.getElementById('checkoutPanel')?.classList.add('hidden');
+      document.getElementById('overlay')?.classList.add('hidden');
+    });
+    document.getElementById('btnOpenMessagesHelp')?.addEventListener('click', () => {
+      if (typeof openMessages === 'function') openMessages();
+    });
+    document.querySelectorAll('[data-scroll]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        document.getElementById(a.dataset.scroll)?.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+    const chk = document.getElementById('btnCheckout');
+    if (chk && !chk._feat) {
+      chk._feat = true;
+      chk.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        if (typeof openCheckout === 'function') openCheckout();
+      }, true);
+    }
   }
 
   if (document.readyState === 'loading') {
