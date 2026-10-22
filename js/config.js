@@ -1,5 +1,5 @@
 /**
- * MercadoPlus v0.1 - Configuración
+ * Mi Vitrina v0.1.1 - Configuración
  * Proyecto Supabase: Mi Vitrina (sdaruvqjvykrrbywiuuf)
  * Auth con Google se mantiene intacto en el proyecto.
  */
@@ -15,9 +15,9 @@ const CONFIG = {
   // false = Supabase real
   DEMO_MODE: false,
 
-  APP_NAME: 'MercadoPlus',
-  VERSION: '0.1.0',
-  CURRENCY: 'COP',
+  APP_NAME: 'Mi Vitrina',
+  VERSION: '0.1.1',
+  CURRENCY: 'CUP',
   CURRENCY_SYMBOL: '$',
 };
 
