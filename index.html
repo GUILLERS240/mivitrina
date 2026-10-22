@@ -62,8 +62,26 @@
   </header>
   <main class="main-content">
     <section id="view-inicio" class="view active">
-      <div class="section-header">
-        <h1>Todos los productos</h1>
+      <div class="hero-banner">
+        <div class="hero-content">
+          <h2>Todo lo que necesitas, en un solo lugar</h2>
+          <p>Descubre productos con la mejor calidad y los mejores precios.</p>
+          <button type="button" class="btn btn-primary hero-cta" id="btnHeroOffers">Ver ofertas</button>
+        </div>
+        <div class="hero-art" aria-hidden="true"><i class="fas fa-shopping-bag"></i></div>
+      </div>
+      <div class="home-cat-strip" id="homeCatStrip">
+        <button type="button" class="home-cat" data-cat="electronica"><i class="fas fa-mobile-alt"></i><span>Celulares</span></button>
+        <button type="button" class="home-cat" data-cat="electronica"><i class="fas fa-laptop"></i><span>Laptops</span></button>
+        <button type="button" class="home-cat" data-cat="electronica"><i class="fas fa-microchip"></i><span>Tecnología</span></button>
+        <button type="button" class="home-cat" data-cat="hogar"><i class="fas fa-home"></i><span>Hogar</span></button>
+        <button type="button" class="home-cat" data-cat="ropa"><i class="fas fa-tshirt"></i><span>Moda</span></button>
+        <button type="button" class="home-cat" data-cat="deportes"><i class="fas fa-futbol"></i><span>Deportes</span></button>
+        <button type="button" class="home-cat" data-cat="belleza"><i class="fas fa-spa"></i><span>Belleza</span></button>
+        <button type="button" class="home-cat" data-view="categorias"><i class="fas fa-ellipsis-h"></i><span>Más</span></button>
+      </div>
+      <div class="section-header section-header-row">
+        <h1>Productos destacados</h1>
         <div class="filters filter-chips">
           <button type="button" class="chip-btn" id="btnOpenCategory"><i class="fas fa-th-large"></i> <span id="categoryLabel">Categoría</span></button>
           <button type="button" class="chip-btn" id="btnOpenSort"><i class="fas fa-sort"></i> <span id="sortLabel">Ordenar</span></button>
@@ -84,6 +102,23 @@
         </div>
       </div>
       <div class="products-grid" id="productsGrid"></div>
+    </section>
+    <section id="view-categorias" class="view">
+      <div class="section-header"><h1>Categorías</h1></div>
+      <div class="categories-grid" id="categoriesGrid">
+        <button type="button" class="cat-card" data-cat="electronica"><div class="cat-icon"><i class="fas fa-mobile-alt"></i></div><span>Celulares</span></button>
+        <button type="button" class="cat-card" data-cat="electronica"><div class="cat-icon"><i class="fas fa-laptop"></i></div><span>Laptops</span></button>
+        <button type="button" class="cat-card" data-cat="electronica"><div class="cat-icon"><i class="fas fa-headphones"></i></div><span>Tecnología</span></button>
+        <button type="button" class="cat-card" data-cat="hogar"><div class="cat-icon"><i class="fas fa-couch"></i></div><span>Hogar</span></button>
+        <button type="button" class="cat-card" data-cat="ropa"><div class="cat-icon"><i class="fas fa-shoe-prints"></i></div><span>Moda</span></button>
+        <button type="button" class="cat-card" data-cat="deportes"><div class="cat-icon"><i class="fas fa-basketball-ball"></i></div><span>Deportes</span></button>
+        <button type="button" class="cat-card" data-cat="juguetes"><div class="cat-icon"><i class="fas fa-puzzle-piece"></i></div><span>Juguetes</span></button>
+        <button type="button" class="cat-card" data-cat="belleza"><div class="cat-icon"><i class="fas fa-spa"></i></div><span>Belleza</span></button>
+        <button type="button" class="cat-card" data-cat="alimentos"><div class="cat-icon"><i class="fas fa-utensils"></i></div><span>Alimentos</span></button>
+        <button type="button" class="cat-card" data-cat="servicios"><div class="cat-icon"><i class="fas fa-concierge-bell"></i></div><span>Servicios</span></button>
+        <button type="button" class="cat-card" data-cat="general"><div class="cat-icon"><i class="fas fa-store"></i></div><span>General</span></button>
+        <button type="button" class="cat-card" data-cat=""><div class="cat-icon"><i class="fas fa-th"></i></div><span>Todas</span></button>
+      </div>
     </section>
     <section id="view-tiendas" class="view"><div class="section-header"><h1>Todas las tiendas</h1></div><div class="stores-grid" id="storesGrid"></div></section>
     <section id="view-pedidos" class="view"><div class="section-header"><h1>Mis Pedidos</h1></div><div class="orders-list" id="ordersList"></div><div class="empty-state hidden" id="ordersEmpty"><i class="fas fa-box-open"></i><p>Aún no tienes pedidos</p><button class="btn btn-primary" data-view="inicio">Ir a comprar</button></div></section>
@@ -111,16 +146,16 @@
               <div class="form-group"><label>Nombre de la tienda *</label><input type="text" id="reqStoreName" required placeholder="Mi Tienda"></div>
               <div class="form-group"><label>Descripción (opcional)</label><textarea id="reqStoreDesc" rows="2" placeholder="Qué vendes..."></textarea></div>
               <div class="form-group"><label>Categoría *</label><select id="reqStoreCategory" required><option value="general">General</option><option value="electronica">Electrónica</option><option value="ropa">Ropa</option><option value="hogar">Hogar</option><option value="alimentos">Alimentos</option><option value="servicios">Servicios</option><option value="belleza">Belleza</option></select></div>
-              <div class="form-group"><label>Logo de la tienda (subir imagen)</label><input type="file" id="reqStoreLogoFile" accept="image/*"><small style="color:var(--text-muted)">Máx. 5 MB</small></div>
-              <div class="form-group"><label>Banner (subir imagen)</label><input type="file" id="reqStoreBannerFile" accept="image/*"><small style="color:var(--text-muted)">Máx. 5 MB</small></div>
+              <div class="form-group"><label>Logo (imagen)</label><input type="file" id="reqStoreLogoFile" accept="image/*"></div>
+              <div class="form-group"><label>Banner (imagen)</label><input type="file" id="reqStoreBannerFile" accept="image/*"></div>
               <div style="display:flex;gap:8px"><button type="submit" class="btn btn-primary">Enviar solicitud</button><button type="button" class="btn btn-outline" id="cancelSellerReq">Cancelar</button></div>
             </form>
           </div>
         </div>
         <div class="profile-card">
-          <h3><i class="fas fa-handshake"></i> Gestores de venta / Referidos</h3>
-          <p id="referralCodeBox" style="font-size:0.9rem;margin-bottom:12px">Tu código de referido aparecerá aquí al iniciar sesión.</p>
-          <div id="managerRequestStatus"><button class="btn btn-secondary" id="btnRequestManager">Solicitar ser gestor de ventas</button></div>
+          <h3><i class="fas fa-handshake"></i> Gestores / Referidos</h3>
+          <p id="referralCodeBox" style="font-size:0.9rem;margin-bottom:12px">Tu código de referido aparecerá al iniciar sesión.</p>
+          <div id="managerRequestStatus"><button class="btn btn-secondary" id="btnRequestManager">Solicitar ser gestor</button></div>
         </div>
         <div class="profile-card mobile-only-block">
           <h3><i class="fas fa-store"></i> Accesos</h3>
@@ -131,25 +166,26 @@
           </div>
         </div>
         <div class="profile-card">
-          <h3><i class="fas fa-cog"></i> Configuración de la app</h3>
+          <h3><i class="fas fa-cog"></i> Configuración</h3>
           <div class="setting-item"><span>Modo oscuro</span><label class="switch"><input type="checkbox" id="darkModeToggle"><span class="slider"></span></label></div>
           <div class="setting-item"><span>Notificaciones push</span><label class="switch"><input type="checkbox" id="pushToggle" checked><span class="slider"></span></label></div>
           <div class="setting-item"><span>Sonidos</span><label class="switch"><input type="checkbox" id="soundToggle" checked><span class="slider"></span></label></div>
         </div>
       </div>
     </section>
-    <div id="cartPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Carrito de compras</h2><button class="close-btn" id="closeCart"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="cartItems"></div><div class="side-panel-footer"><div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div><button class="btn btn-primary btn-block" id="btnCheckout">Realizar pedido</button></div></div>
+    <div id="cartPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Carrito</h2><button class="close-btn" id="closeCart"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="cartItems"></div><div class="side-panel-footer"><div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div><button class="btn btn-primary btn-block" id="btnCheckout">Realizar pedido</button></div></div>
     <div id="messagesPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Mensajes</h2><button class="close-btn" id="closeMessages"><i class="fas fa-times"></i></button></div><div class="messages-layout"><div class="conversations-list" id="conversationsList"></div><div class="chat-area hidden" id="chatArea"><div class="chat-header" id="chatHeader"></div><div class="chat-messages" id="chatMessages"></div><div class="chat-input"><input type="text" id="chatInput" placeholder="Escribe un mensaje..."><button id="sendMsg"><i class="fas fa-paper-plane"></i></button></div></div></div></div>
     <div id="notifPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Notificaciones</h2><button class="close-btn" id="closeNotif"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="notifList"></div></div>
   </main>
   <nav class="bottom-nav">
     <a href="#" class="nav-item active" data-view="inicio"><i class="fas fa-home"></i><span>Inicio</span></a>
+    <a href="#" class="nav-item" data-view="categorias"><i class="fas fa-th-large"></i><span>Categoría</span></a>
     <a href="#" class="nav-item" data-view="tiendas"><i class="fas fa-store"></i><span>Tiendas</span></a>
     <a href="#" class="nav-item" data-view="pedidos"><i class="fas fa-box"></i><span>Pedidos</span></a>
     <a href="#" class="nav-item" data-view="perfil"><i class="fas fa-user"></i><span>Mi Perfil</span></a>
   </nav>
   <div id="authModal" class="modal hidden"><div class="modal-content"><button class="close-btn" id="closeAuth"><i class="fas fa-times"></i></button><div class="auth-tabs"><button class="tab active" data-tab="login">Iniciar sesión</button><button class="tab" data-tab="register">Registrarse</button></div>
-    <form id="loginForm" class="auth-form"><div class="form-group"><label>Correo electrónico</label><input type="email" id="loginEmail" required placeholder="correo@ejemplo.com" autocomplete="email"></div><div class="form-group"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password"></div><button type="submit" class="btn btn-primary btn-block">Entrar</button><div class="auth-divider">o continúa con</div><button type="button" class="btn-google" id="btnGoogleLogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
+    <form id="loginForm" class="auth-form"><div class="form-group"><label>Correo electrónico</label><input type="email" id="loginEmail" required placeholder="correo@ejemplo.com" autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false"></div><div class="form-group"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password" enterkeyhint="go"></div><p class="form-error hidden" id="loginError"></p><button type="submit" class="btn btn-primary btn-block" id="btnLoginSubmit">Entrar</button><div class="auth-divider">o continúa con</div><button type="button" class="btn-google" id="btnGoogleLogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
     <form id="registerForm" class="auth-form hidden"><div class="form-group"><label>Nombre completo</label><input type="text" id="regName" required placeholder="Tu nombre" autocomplete="name"></div><div class="form-group"><label>Correo electrónico</label><input type="email" id="regEmail" required placeholder="correo@ejemplo.com" autocomplete="email"></div><div class="form-group"><label>Contraseña</label><input type="password" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div><div class="form-group"><label>Confirmar contraseña</label><input type="password" id="regPassword2" required placeholder="Repite la contraseña" autocomplete="new-password"></div><button type="submit" class="btn btn-primary btn-block">Crear cuenta</button><div class="auth-divider">o regístrate con</div><button type="button" class="btn-google" id="btnGoogleRegister"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button><p class="auth-note">Al registrarte aceptas los términos de uso.</p></form>
   </div></div>
   <div id="sheetCategory" class="bottom-sheet hidden"><div class="sheet-handle"></div><h3>Categoría</h3><div class="sheet-options" id="categoryOptions">
