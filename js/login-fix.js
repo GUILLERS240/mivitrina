@@ -1,0 +1,89 @@
+/* Fix login móvil — manejador fiable */
+(function () {
+  function showLoginError(msg) {
+    const errEl = document.getElementById('loginError');
+    if (errEl) {
+      errEl.textContent = msg;
+      errEl.classList.remove('hidden');
+    }
+    if (typeof toast === 'function') toast(msg, 'error');
+  }
+
+  async function doLogin(e) {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    const form = document.getElementById('loginForm');
+    const btn = document.getElementById('btnLoginSubmit') || form?.querySelector('button[type="submit"]');
+    const emailEl = document.getElementById('loginEmail');
+    const passEl = document.getElementById('loginPassword');
+    const errEl = document.getElementById('loginError');
+    if (errEl) {
+      errEl.textContent = '';
+      errEl.classList.add('hidden');
+    }
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    let email = (emailEl?.value || '').replace(/[\u200B-\u200D\uFEFF]/g, '').trim().toLowerCase();
+    let password = (passEl?.value || '').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/^\s+|\s+$/g, '');
+
+    if (!email || !password) {
+      showLoginError('Escribe correo y contraseña.');
+      return;
+    }
+    if (!window.sb && !(window.CONFIG && CONFIG.DEMO_MODE)) {
+      showLoginError('Sin conexión al servidor. Recarga la página.');
+      return;
+    }
+
+    if (btn) {
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+    }
+    try {
+      await Auth.login(email, password);
+      if (typeof closeAuthModal === 'function') closeAuthModal();
+      if (typeof updateAuthUI === 'function') updateAuthUI();
+      if (typeof toast === 'function') toast('Bienvenido', 'success');
+    } catch (err) {
+      console.warn('[login-fix]', err);
+      showLoginError(err.message || 'Error al iniciar sesión');
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+  }
+
+  function wire() {
+    const form = document.getElementById('loginForm');
+    if (!form || form._loginFixed) return;
+    form._loginFixed = true;
+    form.addEventListener('submit', doLogin, true);
+    const btn = document.getElementById('btnLoginSubmit');
+    if (btn) {
+      btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        doLogin(e);
+      }, true);
+    }
+    document.getElementById('btnGoogleLogin')?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await Auth.loginWithGoogle();
+      } catch (err) {
+        showLoginError(err.message || 'Error con Google');
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(wire, 50));
+  } else {
+    setTimeout(wire, 50);
+  }
+  window.addEventListener('load', () => setTimeout(wire, 100));
+})();

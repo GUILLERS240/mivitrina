@@ -1,0 +1,32 @@
+/* Auth modal móvil */
+.modal {
+  z-index: 400 !important;
+  align-items: center;
+  padding: 12px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.modal .modal-content {
+  position: relative;
+  z-index: 401;
+  max-height: min(90vh, 640px);
+  overflow-y: auto;
+  width: 100%;
+  max-width: 420px;
+  pointer-events: auto;
+}
+#overlay { z-index: 350 !important; }
+#authModal:not(.hidden) {
+  display: flex !important;
+  pointer-events: auto;
+}
+#authModal .auth-form input {
+  font-size: 16px !important;
+  min-height: 44px;
+}
+#authModal .btn-block,
+#btnLoginSubmit {
+  min-height: 48px;
+  touch-action: manipulation;
+}
+.side-panel { z-index: 360; }

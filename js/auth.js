@@ -1,6 +1,5 @@
 /**
- * Mi Vitrina — Auth
- * Supabase Auth (email + Google) + fallback DEMO.
+ * Mi Vitrina — Auth (móvil + escritorio)
  */
 const Auth = {
   currentUser: null,
@@ -13,9 +12,13 @@ const Auth = {
       } catch (_) {}
       return this.currentUser;
     }
-    const { data: { session } } = await sb.auth.getSession();
-    if (session?.user) {
-      this.currentUser = await this._mapUser(session.user);
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      if (session?.user) {
+        this.currentUser = await this._mapUser(session.user);
+      }
+    } catch (e) {
+      console.warn('[Auth.init]', e);
     }
     sb.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
@@ -26,6 +29,20 @@ const Auth = {
       if (typeof window.onAuthChange === 'function') window.onAuthChange();
     });
     return this.currentUser;
+  },
+
+  _cleanEmail(email) {
+    return String(email || '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .trim()
+      .toLowerCase();
+  },
+
+  _cleanPassword(password) {
+    return String(password || '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '')
+      .replace(/\r\n/g, '')
+      .replace(/^\s+|\s+$/g, '');
   },
 
   async _mapUser(supabaseUser) {
@@ -55,8 +72,8 @@ const Auth = {
   },
 
   async register(email, password, fullName) {
-    email = String(email || '').trim().toLowerCase();
-    password = String(password || '');
+    email = this._cleanEmail(email);
+    password = this._cleanPassword(password);
     fullName = String(fullName || '').trim();
     if (!email || !password) throw new Error('Correo y contraseña son obligatorios.');
     if (password.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres.');
@@ -92,7 +109,7 @@ const Auth = {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: window.location.origin + '/',
       },
     });
     if (error) {
@@ -120,29 +137,23 @@ const Auth = {
         return this.currentUser;
       }
       try {
-        const { data: loginData, error: loginErr } = await sb.auth.signInWithPassword({ email, password });
-        if (!loginErr && loginData?.user) {
-          this.currentUser = await this._mapUser(loginData.user);
-          return this.currentUser;
-        }
-        if (loginErr) {
-          const m = (loginErr.message || '').toLowerCase();
-          if (m.includes('confirm') || m.includes('verify') || m.includes('not confirmed')) {
-            throw new Error('Cuenta creada. Debes verificar tu correo antes de entrar. Revisa tu bandeja.');
-          }
-        }
+        return await this.login(email, password);
       } catch (e) {
-        if (e.message && e.message.includes('verificar')) throw e;
+        if (e.message && e.message.toLowerCase().includes('verificar')) throw e;
+        throw new Error('Cuenta creada. Si no puedes entrar, revisa tu correo para verificarla.');
       }
     }
-
     return data;
   },
 
   async login(email, password) {
-    email = String(email || '').trim().toLowerCase();
-    password = String(password || '');
+    email = this._cleanEmail(email);
+    password = this._cleanPassword(password);
     if (!email || !password) throw new Error('Escribe correo y contraseña.');
+
+    if (!window.sb && !CONFIG.DEMO_MODE) {
+      throw new Error('No hay conexión con el servidor. Recarga la página.');
+    }
 
     if (CONFIG.DEMO_MODE || !window.sb) {
       const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
@@ -155,21 +166,33 @@ const Auth = {
       return safeUser;
     }
 
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    let data, error;
+    try {
+      const res = await sb.auth.signInWithPassword({ email, password });
+      data = res.data;
+      error = res.error;
+    } catch (netErr) {
+      console.warn('[Auth.login network]', netErr);
+      throw new Error('Sin conexión. Revisa tu internet e inténtalo de nuevo.');
+    }
+
     if (error) {
       const msg = (error.message || '').toLowerCase();
-      console.warn('[Auth.login]', error.message, error.status);
+      console.warn('[Auth.login]', error.message, error.status, error.code);
       if (msg.includes('invalid') || msg.includes('credentials') || msg.includes('invalid login')) {
-        throw new Error('Correo o contraseña incorrectos. Si acabas de registrarte, revisa tu correo o usa "Continuar con Google".');
+        throw new Error('Correo o contraseña incorrectos. Escribe el correo sin espacios y revisa mayúsculas en la contraseña.');
       }
       if (msg.includes('confirm') || msg.includes('verify') || msg.includes('not confirmed')) {
         throw new Error('Debes verificar tu correo antes de entrar. Revisa tu bandeja (y spam).');
       }
-      if (msg.includes('network') || msg.includes('fetch')) {
+      if (msg.includes('network') || msg.includes('fetch') || msg.includes('failed')) {
         throw new Error('Sin conexión. Revisa tu internet e inténtalo de nuevo.');
       }
       throw new Error(error.message || 'Error al iniciar sesión');
     }
+
+    if (!data?.user) throw new Error('No se pudo iniciar sesión. Inténtalo de nuevo.');
+
     this.currentUser = await this._mapUser(data.user);
     if (email === CONFIG.ADMIN_EMAIL.toLowerCase()) {
       this.currentUser.role = 'admin';
@@ -187,7 +210,7 @@ const Auth = {
 
   async loginWithGoogle() {
     if (CONFIG.DEMO_MODE || !window.sb) {
-      throw new Error('Google login no disponible en modo demo. Usa email/contraseña.');
+      throw new Error('Google login no disponible. Usa email/contraseña.');
     }
     const redirectTo = (window.location.origin || '').replace(/\/$/, '') + '/';
     const { data, error } = await sb.auth.signInWithOAuth({
@@ -200,7 +223,7 @@ const Auth = {
     });
     if (error) {
       console.warn('[Auth.google]', error);
-      throw new Error(error.message || 'Error al conectar con Google. Revisa la configuración OAuth en Supabase.');
+      throw new Error(error.message || 'Error al conectar con Google.');
     }
     return data;
   },
@@ -227,7 +250,7 @@ const Auth = {
 
   async logout() {
     if (!CONFIG.DEMO_MODE && window.sb) {
-      await sb.auth.signOut();
+      try { await sb.auth.signOut(); } catch (_) {}
     }
     this.currentUser = null;
     localStorage.removeItem('mp_user');
