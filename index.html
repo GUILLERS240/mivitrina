@@ -2,15 +2,22 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#232f3e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Mi Vitrina">
+  <meta name="description" content="Mi Vitrina — marketplace online para clientes y vendedores">
   <title>Mi Vitrina - Tienda Online</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <!-- Header -->
   <header class="header">
     <div class="header-left">
       <button class="menu-btn desktop-only" id="sidebarToggle">
@@ -21,20 +28,15 @@
         <span>Mi Vitrina</span>
       </a>
     </div>
-
     <div class="search-bar">
       <i class="fas fa-search"></i>
       <input type="text" id="searchInput" placeholder="Buscar productos, tiendas...">
     </div>
-
     <div class="header-right">
-      <!-- Guest -->
       <div id="guestActions" class="auth-actions">
         <button class="btn btn-outline" id="btnLogin">Iniciar sesión</button>
         <button class="btn btn-primary" id="btnRegister">Registrarse</button>
       </div>
-
-      <!-- Logged in -->
       <div id="userActions" class="user-actions hidden">
         <button class="icon-btn" id="btnMessages" title="Mensajes">
           <i class="fas fa-comments"></i>
@@ -64,9 +66,7 @@
     </div>
   </header>
 
-  <!-- Main Content -->
   <main class="main-content">
-    <!-- INICIO - Todos los productos -->
     <section id="view-inicio" class="view active">
       <div class="section-header">
         <h1>Todos los productos</h1>
@@ -87,29 +87,17 @@
           </select>
         </div>
       </div>
-      <div class="products-grid" id="productsGrid">
-        <!-- Productos se cargan con JS -->
-      </div>
+      <div class="products-grid" id="productsGrid"></div>
     </section>
 
-    <!-- TIENDAS -->
     <section id="view-tiendas" class="view">
-      <div class="section-header">
-        <h1>Todas las tiendas</h1>
-      </div>
-      <div class="stores-grid" id="storesGrid">
-        <!-- Tiendas se cargan con JS -->
-      </div>
+      <div class="section-header"><h1>Todas las tiendas</h1></div>
+      <div class="stores-grid" id="storesGrid"></div>
     </section>
 
-    <!-- PEDIDOS -->
     <section id="view-pedidos" class="view">
-      <div class="section-header">
-        <h1>Mis Pedidos</h1>
-      </div>
-      <div class="orders-list" id="ordersList">
-        <!-- Pedidos se cargan con JS -->
-      </div>
+      <div class="section-header"><h1>Mis Pedidos</h1></div>
+      <div class="orders-list" id="ordersList"></div>
       <div class="empty-state hidden" id="ordersEmpty">
         <i class="fas fa-box-open"></i>
         <p>Aún no tienes pedidos</p>
@@ -117,11 +105,8 @@
       </div>
     </section>
 
-    <!-- MI PERFIL -->
     <section id="view-perfil" class="view">
-      <div class="section-header">
-        <h1>Mi Perfil</h1>
-      </div>
+      <div class="section-header"><h1>Mi Perfil</h1></div>
       <div class="profile-container">
         <div class="profile-card">
           <div class="profile-avatar">
@@ -156,7 +141,6 @@
             <button type="submit" class="btn btn-primary">Guardar cambios</button>
           </form>
         </div>
-
         <div class="profile-card">
           <h3><i class="fas fa-store"></i> Convertirme en vendedor</h3>
           <p>Vende tus productos en Mi Vitrina. Completa la solicitud y un admin la revisará.</p>
@@ -164,7 +148,6 @@
             <button class="btn btn-secondary" id="btnRequestSeller">Solicitar ser vendedor</button>
           </div>
         </div>
-
         <div class="profile-card">
           <h3><i class="fas fa-cog"></i> Configuración de la app</h3>
           <div class="setting-item">
@@ -192,25 +175,18 @@
       </div>
     </section>
 
-    <!-- CARRITO (overlay/modal) -->
     <div id="cartPanel" class="side-panel hidden">
       <div class="side-panel-header">
         <h2>Carrito de compras</h2>
         <button class="close-btn" id="closeCart"><i class="fas fa-times"></i></button>
       </div>
-      <div class="side-panel-body" id="cartItems">
-        <!-- Items del carrito -->
-      </div>
+      <div class="side-panel-body" id="cartItems"></div>
       <div class="side-panel-footer">
-        <div class="cart-total">
-          <span>Total:</span>
-          <strong id="cartTotal">$0</strong>
-        </div>
+        <div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div>
         <button class="btn btn-primary btn-block" id="btnCheckout">Realizar pedido</button>
       </div>
     </div>
 
-    <!-- MENSAJES -->
     <div id="messagesPanel" class="side-panel hidden">
       <div class="side-panel-header">
         <h2>Mensajes</h2>
@@ -229,7 +205,6 @@
       </div>
     </div>
 
-    <!-- NOTIFICACIONES -->
     <div id="notifPanel" class="side-panel hidden">
       <div class="side-panel-header">
         <h2>Notificaciones</h2>
@@ -239,27 +214,13 @@
     </div>
   </main>
 
-  <!-- Bottom Navigation (Mobile) -->
   <nav class="bottom-nav">
-    <a href="#" class="nav-item active" data-view="inicio">
-      <i class="fas fa-home"></i>
-      <span>Inicio</span>
-    </a>
-    <a href="#" class="nav-item" data-view="tiendas">
-      <i class="fas fa-store"></i>
-      <span>Tiendas</span>
-    </a>
-    <a href="#" class="nav-item" data-view="pedidos">
-      <i class="fas fa-box"></i>
-      <span>Pedidos</span>
-    </a>
-    <a href="#" class="nav-item" data-view="perfil">
-      <i class="fas fa-user"></i>
-      <span>Mi Perfil</span>
-    </a>
+    <a href="#" class="nav-item active" data-view="inicio"><i class="fas fa-home"></i><span>Inicio</span></a>
+    <a href="#" class="nav-item" data-view="tiendas"><i class="fas fa-store"></i><span>Tiendas</span></a>
+    <a href="#" class="nav-item" data-view="pedidos"><i class="fas fa-box"></i><span>Pedidos</span></a>
+    <a href="#" class="nav-item" data-view="perfil"><i class="fas fa-user"></i><span>Mi Perfil</span></a>
   </nav>
 
-  <!-- Auth Modal -->
   <div id="authModal" class="modal hidden">
     <div class="modal-content">
       <button class="close-btn" id="closeAuth"><i class="fas fa-times"></i></button>
@@ -301,7 +262,6 @@
     </div>
   </div>
 
-  <!-- Product Detail Modal -->
   <div id="productModal" class="modal hidden">
     <div class="modal-content modal-lg">
       <button class="close-btn" id="closeProduct"><i class="fas fa-times"></i></button>
@@ -309,10 +269,7 @@
     </div>
   </div>
 
-  <!-- Toast notifications -->
   <div id="toastContainer"></div>
-
-  <!-- Overlay -->
   <div id="overlay" class="overlay hidden"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -321,5 +278,12 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script src="js/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+  </script>
 </body>
 </html>
