@@ -2,93 +2,49 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Vendedor - MercadoPlus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Panel Vendedor - Mi Vitrina</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     .seller-layout { display: flex; min-height: 100vh; }
-    .seller-sidebar {
-      width: 240px;
-      background: var(--secondary);
-      color: #fff;
-      padding: 20px 0;
-      flex-shrink: 0;
-    }
-    .seller-sidebar .logo {
-      padding: 0 20px 24px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .seller-sidebar .logo i { color: var(--primary); }
-    .seller-nav a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: rgba(255,255,255,0.7);
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
-    .seller-nav a:hover, .seller-nav a.active {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-    }
-    .seller-nav a.active { border-left: 3px solid var(--primary); }
+    .seller-sidebar { width: 240px; background: var(--secondary, #1a1a2e); color: #fff; padding: 20px 0; flex-shrink: 0; }
+    .seller-sidebar .logo { padding: 0 20px 24px; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .seller-sidebar .logo i { color: var(--primary, #146eb4); }
+    .seller-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: rgba(255,255,255,0.7); font-size: 0.9rem; transition: all 0.2s; cursor: pointer; text-decoration: none; }
+    .seller-nav a:hover, .seller-nav a.active { background: rgba(255,255,255,0.1); color: #fff; }
+    .seller-nav a.active { border-left: 3px solid var(--primary, #146eb4); }
     .seller-main { flex: 1; background: var(--bg); overflow-y: auto; }
-    .seller-header {
-      background: var(--bg-card);
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .seller-header { background: var(--bg-card); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .seller-content { padding: 24px; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: var(--bg-card);
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-    }
-    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
-    .stat-card .stat-label { font-size: 0.85rem; color: var(--text-muted); }
     .seller-section { display: none; }
     .seller-section.active { display: block; }
+    .quick-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 28px; }
+    .quick-card { background: var(--bg-card); border-radius: 12px; padding: 20px 12px; text-align: center; box-shadow: var(--shadow); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border: 1px solid var(--border); }
+    .quick-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+    .quick-card i { font-size: 1.6rem; color: var(--primary, #146eb4); margin-bottom: 8px; display: block; }
+    .quick-card span { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg-card); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); }
+    .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; margin: 4px 0; }
+    .stat-card .stat-label { font-size: 0.8rem; color: var(--text-muted); }
     .table-wrap { overflow-x: auto; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--bg-card);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: var(--bg); font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
-    td { font-size: 0.9rem; }
-    .product-form {
-      background: var(--bg-card);
-      padding: 24px;
-      border-radius: 8px;
-      box-shadow: var(--shadow);
-      max-width: 600px;
-    }
+    table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    th { background: var(--bg); font-weight: 600; color: var(--text-muted); }
+    .product-form, .store-form { background: var(--bg-card); padding: 20px; border-radius: 10px; box-shadow: var(--shadow); max-width: 560px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .qr-preview { max-width: 160px; border-radius: 8px; margin-top: 8px; }
+    .store-link-box { background: var(--bg); border: 1px dashed var(--border); border-radius: 8px; padding: 12px; margin: 12px 0; word-break: break-all; font-size: 0.9rem; }
+    .payment-alert { background: #fff3cd; border-left: 4px solid #ffc107; padding: 12px; border-radius: 6px; margin-bottom: 12px; font-size: 0.9rem; }
+    [data-theme="dark"] .payment-alert { background: #3d3400; }
     @media (max-width: 768px) {
       .seller-layout { flex-direction: column; }
       .seller-sidebar { width: 100%; }
       .seller-nav { display: flex; overflow-x: auto; }
       .seller-nav a { white-space: nowrap; border-left: none !important; }
+      .form-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -97,156 +53,208 @@
     <aside class="seller-sidebar">
       <div class="logo"><i class="fas fa-store"></i> Panel Vendedor</div>
       <nav class="seller-nav">
-        <a href="#" class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-        <a href="#" data-section="products"><i class="fas fa-box"></i> Productos</a>
-        <a href="#" data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
-        <a href="#" data-section="messages"><i class="fas fa-comments"></i> Mensajes</a>
-        <a href="#" data-section="store"><i class="fas fa-cog"></i> Mi Tienda</a>
-        <a href="index.html"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
+        <a class="active" data-section="dashboard"><i class="fas fa-th-large"></i> Acceso rápido</a>
+        <a data-section="products"><i class="fas fa-box"></i> Productos</a>
+        <a data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
+        <a data-section="promos"><i class="fas fa-tags"></i> Promociones</a>
+        <a data-section="store"><i class="fas fa-cog"></i> Mi Tienda</a>
+        <a data-section="payments"><i class="fas fa-money-bill-wave"></i> Pagos / QR</a>
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Volver</a>
       </nav>
     </aside>
 
     <div class="seller-main">
       <div class="seller-header">
-        <h2 id="sectionTitle">Dashboard</h2>
-        <div>
-          <span id="sellerName">Vendedor</span>
-          <a href="index.html" class="btn btn-sm btn-outline" style="margin-left:12px;border-color:var(--border);color:var(--text)">Salir</a>
+        <h2 id="sectionTitle">Acceso rápido</h2>
+        <div><span id="sellerName">Vendedor</span>
+          <a href="index.html" class="btn btn-sm btn-outline" style="margin-left:10px">Salir</a>
         </div>
       </div>
 
       <div class="seller-content">
-        <!-- Dashboard -->
+        <!-- ACCESO RÁPIDO -->
         <section id="sec-dashboard" class="seller-section active">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">Productos</div>
-              <div class="stat-value" id="statProducts">0</div>
+          <div class="quick-grid">
+            <div class="quick-card" data-goto="products" data-action="new">
+              <i class="fas fa-plus-circle"></i><span>Nuevo producto</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-label">Pedidos pendientes</div>
-              <div class="stat-value" id="statPending">0</div>
+            <div class="quick-card" data-goto="store">
+              <i class="fas fa-store"></i><span>Mi tienda</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-label">Ventas del mes</div>
-              <div class="stat-value" id="statSales">$0</div>
+            <div class="quick-card" data-goto="orders">
+              <i class="fas fa-shopping-bag"></i><span>Pedidos</span>
             </div>
-            <div class="stat-card">
-              <div class="stat-label">Mensajes sin leer</div>
-              <div class="stat-value" id="statMsgs">0</div>
+            <div class="quick-card" data-goto="payments">
+              <i class="fas fa-qrcode"></i><span>QR de pago</span>
+            </div>
+            <div class="quick-card" data-goto="promos">
+              <i class="fas fa-percent"></i><span>Promociones</span>
+            </div>
+            <div class="quick-card" id="btnOpenStore">
+              <i class="fas fa-external-link-alt"></i><span>Ver mi tienda</span>
             </div>
           </div>
-          <h3 style="margin-bottom:12px">Últimos pedidos</h3>
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-label">Productos</div><div class="stat-value" id="statProducts">0</div></div>
+            <div class="stat-card"><div class="stat-label">Pedidos pendientes</div><div class="stat-value" id="statPending">0</div></div>
+            <div class="stat-card"><div class="stat-label">Pagos por confirmar</div><div class="stat-value" id="statPayPending">0</div></div>
+            <div class="stat-card"><div class="stat-label">Ventas</div><div class="stat-value" id="statSales">$0</div></div>
+          </div>
+          <h3 style="margin-bottom:10px">Últimos pedidos</h3>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr><th>ID</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr>
-              </thead>
-              <tbody id="recentOrdersBody">
-                <tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No hay pedidos aún</td></tr>
-              </tbody>
+              <thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Pago</th><th>Estado</th><th></th></tr></thead>
+              <tbody id="recentOrdersBody"><tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr></tbody>
             </table>
           </div>
         </section>
 
-        <!-- Productos -->
+        <!-- PRODUCTOS -->
         <section id="sec-products" class="seller-section">
-          <div style="display:flex;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
-            <h3>Mis Productos</h3>
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+            <h3>Mis productos</h3>
             <button class="btn btn-primary" id="btnNewProduct"><i class="fas fa-plus"></i> Nuevo producto</button>
           </div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Categoría</th><th>Acciones</th></tr>
-              </thead>
+              <thead><tr><th>Img</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Acciones</th></tr></thead>
               <tbody id="productsBody"></tbody>
             </table>
           </div>
-
-          <!-- Formulario nuevo producto -->
-          <div id="productFormWrap" class="hidden" style="margin-top:24px">
+          <div id="productFormWrap" class="hidden" style="margin-top:20px">
             <div class="product-form">
               <h3 id="formTitle">Nuevo producto</h3>
               <form id="productForm">
-                <div class="form-group">
-                  <label>Nombre</label>
-                  <input type="text" id="prodName" required>
+                <input type="hidden" id="prodEditId">
+                <div class="form-group"><label>Nombre</label><input type="text" id="prodName" required></div>
+                <div class="form-group"><label>Descripción</label><textarea id="prodDesc" rows="2"></textarea></div>
+                <div class="form-row">
+                  <div class="form-group"><label>Precio (CUP)</label><input type="number" id="prodPrice" required min="0" step="0.01"></div>
+                  <div class="form-group"><label>Precio anterior (descuento)</label><input type="number" id="prodOldPrice" min="0" step="0.01" placeholder="Opcional"></div>
                 </div>
-                <div class="form-group">
-                  <label>Descripción</label>
-                  <textarea id="prodDesc" rows="3" required></textarea>
+                <div class="form-row">
+                  <div class="form-group"><label>Stock</label><input type="number" id="prodStock" min="0" value="10"></div>
+                  <div class="form-group"><label>Categoría</label>
+                    <select id="prodCategory">
+                      <option value="electronica">Electrónica</option>
+                      <option value="ropa">Ropa</option>
+                      <option value="hogar">Hogar</option>
+                      <option value="deportes">Deportes</option>
+                      <option value="belleza">Belleza</option>
+                      <option value="otros">Otros</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="form-group">
-                  <label>Precio (COP)</label>
-                  <input type="number" id="prodPrice" required min="0">
-                </div>
-                <div class="form-group">
-                  <label>Precio anterior (opcional)</label>
-                  <input type="number" id="prodOldPrice" min="0">
-                </div>
-                <div class="form-group">
-                  <label>Stock</label>
-                  <input type="number" id="prodStock" required min="0" value="10">
-                </div>
-                <div class="form-group">
-                  <label>Categoría</label>
-                  <select id="prodCategory">
-                    <option value="electronica">Electrónica</option>
-                    <option value="ropa">Ropa</option>
-                    <option value="hogar">Hogar</option>
-                    <option value="deportes">Deportes</option>
-                    <option value="belleza">Belleza</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label>URL de imagen</label>
-                  <input type="url" id="prodImage" placeholder="https://...">
-                </div>
+                <div class="form-group"><label>URL de imagen</label><input type="url" id="prodImage" placeholder="https://..."></div>
                 <div style="display:flex;gap:8px">
                   <button type="submit" class="btn btn-primary">Guardar</button>
-                  <button type="button" class="btn btn-outline" id="cancelProduct" style="border-color:var(--border);color:var(--text)">Cancelar</button>
+                  <button type="button" class="btn btn-outline" id="cancelProduct">Cancelar</button>
                 </div>
               </form>
             </div>
           </div>
         </section>
 
-        <!-- Pedidos -->
+        <!-- PEDIDOS -->
         <section id="sec-orders" class="seller-section">
-          <h3 style="margin-bottom:16px">Pedidos de mi tienda</h3>
+          <h3 style="margin-bottom:14px">Pedidos de mi tienda</h3>
+          <div id="paymentAlerts"></div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr><th>ID</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
-              </thead>
-              <tbody id="ordersBody">
-                <tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>
-              </tbody>
+              <thead><tr><th>ID</th><th>Cliente / Tel</th><th>Total</th><th>Pago</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="ordersBody"><tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr></tbody>
             </table>
           </div>
         </section>
 
-        <!-- Mensajes -->
-        <section id="sec-messages" class="seller-section">
-          <h3 style="margin-bottom:16px">Mensajes de clientes</h3>
-          <p style="color:var(--text-muted)">Los mensajes aparecerán aquí cuando los clientes te escriban. (Funcionalidad completa en v0.2 con Supabase Realtime)</p>
+        <!-- PROMOS -->
+        <section id="sec-promos" class="seller-section">
+          <div style="display:flex;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+            <h3>Códigos de promoción</h3>
+            <button class="btn btn-primary" id="btnNewPromo"><i class="fas fa-plus"></i> Nuevo código</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Código</th><th>Descuento</th><th>Usos</th><th>Activo</th><th></th></tr></thead>
+              <tbody id="promosBody"><tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin códigos aún</td></tr></tbody>
+            </table>
+          </div>
+          <div id="promoFormWrap" class="hidden" style="margin-top:16px">
+            <div class="product-form">
+              <h3>Nuevo código promo</h3>
+              <form id="promoForm">
+                <div class="form-group"><label>Código</label><input type="text" id="promoCode" required placeholder="VERANO20" style="text-transform:uppercase"></div>
+                <div class="form-row">
+                  <div class="form-group"><label>% descuento</label><input type="number" id="promoPercent" min="1" max="100" placeholder="20"></div>
+                  <div class="form-group"><label>O monto fijo</label><input type="number" id="promoAmount" min="0" placeholder="Opcional"></div>
+                </div>
+                <div class="form-group"><label>Usos máximos (vacío = ilimitado)</label><input type="number" id="promoMax" min="1"></div>
+                <div style="display:flex;gap:8px">
+                  <button type="submit" class="btn btn-primary">Crear</button>
+                  <button type="button" class="btn btn-outline" id="cancelPromo">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
         </section>
 
-        <!-- Mi Tienda -->
+        <!-- MI TIENDA -->
         <section id="sec-store" class="seller-section">
-          <h3 style="margin-bottom:16px">Configuración de mi tienda</h3>
-          <div class="product-form">
+          <h3 style="margin-bottom:14px">Configuración de mi tienda</h3>
+          <div class="store-form">
             <form id="storeForm">
-              <div class="form-group">
-                <label>Nombre de la tienda</label>
-                <input type="text" id="storeName" required>
+              <div class="form-group"><label>Nombre de la tienda</label><input type="text" id="storeName" required></div>
+              <div class="form-group"><label>Slug (URL amigable)</label>
+                <input type="text" id="storeSlug" required pattern="[a-z0-9\-]+" placeholder="mi-tienda">
+                <small style="color:var(--text-muted)">Solo letras minúsculas, números y guiones. Ej: /tienda/mi-tienda</small>
               </div>
-              <div class="form-group">
-                <label>Descripción</label>
-                <textarea id="storeDesc" rows="3"></textarea>
+              <div class="store-link-box" id="storeLinkPreview">Tu tienda: —</div>
+              <div class="form-group"><label>Descripción (opcional)</label><textarea id="storeDesc" rows="2"></textarea></div>
+              <div class="form-group"><label>Categoría</label>
+                <select id="storeCategory">
+                  <option value="general">General</option>
+                  <option value="electronica">Electrónica</option>
+                  <option value="ropa">Ropa</option>
+                  <option value="hogar">Hogar</option>
+                  <option value="alimentos">Alimentos</option>
+                  <option value="servicios">Servicios</option>
+                </select>
               </div>
-              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+              <div class="form-group"><label>URL logo / foto de perfil</label><input type="url" id="storeLogo" placeholder="https://..."></div>
+              <div class="form-group"><label>URL banner</label><input type="url" id="storeBanner" placeholder="https://..."></div>
+              <button type="submit" class="btn btn-primary">Guardar tienda</button>
+            </form>
+            <div style="margin-top:20px">
+              <h4>Código QR de tu tienda</h4>
+              <p style="font-size:0.85rem;color:var(--text-muted)">Compártelo para que entren directo a tu tienda</p>
+              <img id="storeQrImg" class="qr-preview" alt="QR tienda" style="display:none">
+              <button type="button" class="btn btn-outline btn-sm" id="btnGenStoreQr" style="margin-top:8px"><i class="fas fa-qrcode"></i> Generar / actualizar QR</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- PAGOS / QR TRANSFERENCIA -->
+        <section id="sec-payments" class="seller-section">
+          <h3 style="margin-bottom:14px">Sistema de transferencia</h3>
+          <div class="store-form">
+            <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:16px">Configura cómo recibes los pagos. Los clientes verán el QR al comprar.</p>
+            <form id="paymentForm">
+              <div class="form-group"><label>Método de transferencia</label>
+                <select id="payMethod">
+                  <option value="">Sin configurar</option>
+                  <option value="enzona">Enzona</option>
+                  <option value="transfermovil">Transfermóvil</option>
+                  <option value="ambos">Ambos (Enzona y Transfermóvil)</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Teléfono asociado al pago</label><input type="tel" id="payPhone" placeholder="+53 5..."></div>
+              <div class="form-group"><label>Número de tarjeta (opcional)</label><input type="text" id="payCard" placeholder="XXXX-XXXX-XXXX-XXXX"></div>
+              <div class="form-group"><label>URL del código QR de pago</label>
+                <input type="url" id="payQrUrl" placeholder="https://...imagen-del-qr.png">
+                <small style="color:var(--text-muted)">Sube tu QR a Imgur u otro hosting y pega el enlace aquí</small>
+              </div>
+              <img id="payQrPreview" class="qr-preview" style="display:none" alt="QR pago">
+              <button type="submit" class="btn btn-primary" style="margin-top:12px">Guardar configuración de pago</button>
             </form>
           </div>
         </section>
@@ -262,8 +270,10 @@
   <script src="js/supabase-client.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    // Panel Vendedor v0.1
-    const sellerProducts = JSON.parse(localStorage.getItem('mp_seller_products') || '[]');
+    let myStore = null;
+    let myProducts = [];
+    let myOrders = [];
+    let myPromos = [];
 
     function toast(msg, type='') {
       const c = document.getElementById('toastContainer');
@@ -273,191 +283,422 @@
       c.appendChild(el);
       setTimeout(() => el.remove(), 3000);
     }
+    function formatPrice(n) { return (CONFIG.CURRENCY_SYMBOL || '$') + Number(n).toLocaleString('es-CO'); }
+    function slugify(s) {
+      return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48);
+    }
 
-    function formatPrice(n) {
-      return '$' + Number(n).toLocaleString('es-CO');
+    function showSection(name) {
+      document.querySelectorAll('.seller-nav a[data-section]').forEach(a => a.classList.toggle('active', a.dataset.section === name));
+      document.querySelectorAll('.seller-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + name)?.classList.add('active');
+      const titles = { dashboard: 'Acceso rápido', products: 'Productos', orders: 'Pedidos', promos: 'Promociones', store: 'Mi Tienda', payments: 'Pagos / QR' };
+      document.getElementById('sectionTitle').textContent = titles[name] || name;
+      if (name === 'products') renderProducts();
+      if (name === 'orders') renderOrders();
+      if (name === 'promos') renderPromos();
+      if (name === 'store') fillStoreForm();
+      if (name === 'payments') fillPaymentForm();
+      if (name === 'dashboard') renderDashboard();
     }
 
     async function init() {
       await Auth.init();
-      if (!Auth.isLoggedIn()) {
-        alert('Debes iniciar sesión');
-        window.location.href = 'index.html';
+      if (!Auth.isLoggedIn()) { alert('Debes iniciar sesión'); location.href = 'index.html'; return; }
+      if (!Auth.isSeller() && !Auth.isAdmin()) {
+        alert('No eres vendedor. Solicita ser vendedor desde tu perfil.');
+        location.href = 'index.html';
         return;
       }
-      // En demo permitir acceso a cualquiera logueado para probar
-      // En producción: if (!Auth.isSeller()) { ... }
-
       document.getElementById('sellerName').textContent = Auth.getUser().name;
 
-      // Navegación
       document.querySelectorAll('.seller-nav a[data-section]').forEach(a => {
-        a.addEventListener('click', (e) => {
-          e.preventDefault();
-          document.querySelectorAll('.seller-nav a').forEach(x => x.classList.remove('active'));
-          a.classList.add('active');
-          document.querySelectorAll('.seller-section').forEach(s => s.classList.remove('active'));
-          document.getElementById('sec-' + a.dataset.section).classList.add('active');
-          document.getElementById('sectionTitle').textContent = a.textContent.trim();
-          if (a.dataset.section === 'products') renderSellerProducts();
-          if (a.dataset.section === 'orders') renderSellerOrders();
-          if (a.dataset.section === 'dashboard') renderDashboard();
+        a.addEventListener('click', e => { e.preventDefault(); showSection(a.dataset.section); });
+      });
+      document.querySelectorAll('.quick-card[data-goto]').forEach(card => {
+        card.addEventListener('click', () => {
+          showSection(card.dataset.goto);
+          if (card.dataset.action === 'new') {
+            document.getElementById('productFormWrap').classList.remove('hidden');
+            document.getElementById('productForm').reset();
+            document.getElementById('prodEditId').value = '';
+            document.getElementById('formTitle').textContent = 'Nuevo producto';
+          }
         });
       });
 
-      // Productos
-      document.getElementById('btnNewProduct').addEventListener('click', () => {
+      await loadMyStore();
+      await loadProducts();
+      await loadOrders();
+      await loadPromos();
+      renderDashboard();
+
+      document.getElementById('btnNewProduct').onclick = () => {
         document.getElementById('productFormWrap').classList.remove('hidden');
-        document.getElementById('formTitle').textContent = 'Nuevo producto';
         document.getElementById('productForm').reset();
+        document.getElementById('prodEditId').value = '';
+        document.getElementById('formTitle').textContent = 'Nuevo producto';
+      };
+      document.getElementById('cancelProduct').onclick = () => document.getElementById('productFormWrap').classList.add('hidden');
+      document.getElementById('productForm').onsubmit = saveProduct;
+
+      document.getElementById('storeName').addEventListener('input', e => {
+        if (!document.getElementById('storeSlug').dataset.manual) {
+          document.getElementById('storeSlug').value = slugify(e.target.value);
+          updateStoreLinkPreview();
+        }
       });
-      document.getElementById('cancelProduct').addEventListener('click', () => {
-        document.getElementById('productFormWrap').classList.add('hidden');
+      document.getElementById('storeSlug').addEventListener('input', () => {
+        document.getElementById('storeSlug').dataset.manual = '1';
+        updateStoreLinkPreview();
       });
-      document.getElementById('productForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const prod = {
-          id: 'sp-' + Date.now(),
-          name: document.getElementById('prodName').value,
-          description: document.getElementById('prodDesc').value,
-          price: +document.getElementById('prodPrice').value,
-          old_price: document.getElementById('prodOldPrice').value ? +document.getElementById('prodOldPrice').value : null,
-          stock: +document.getElementById('prodStock').value,
-          category: document.getElementById('prodCategory').value,
-          image: document.getElementById('prodImage').value || `https://picsum.photos/seed/${Date.now()}/400/400`,
-          store_id: 'my-store',
-          created_at: new Date().toISOString(),
-        };
-        sellerProducts.push(prod);
-        localStorage.setItem('mp_seller_products', JSON.stringify(sellerProducts));
-        // También agregarlo a MOCK para que aparezca en la tienda (demo)
-        MOCK_PRODUCTS.push(prod);
-        toast('Producto creado', 'success');
-        document.getElementById('productFormWrap').classList.add('hidden');
-        renderSellerProducts();
-        renderDashboard();
+      document.getElementById('storeForm').onsubmit = saveStore;
+      document.getElementById('paymentForm').onsubmit = savePayments;
+      document.getElementById('payQrUrl').addEventListener('input', e => {
+        const img = document.getElementById('payQrPreview');
+        if (e.target.value) { img.src = e.target.value; img.style.display = 'block'; }
+        else img.style.display = 'none';
       });
 
-      renderDashboard();
-      renderSellerProducts();
+      document.getElementById('btnNewPromo').onclick = () => {
+        document.getElementById('promoFormWrap').classList.remove('hidden');
+        document.getElementById('promoForm').reset();
+      };
+      document.getElementById('cancelPromo').onclick = () => document.getElementById('promoFormWrap').classList.add('hidden');
+      document.getElementById('promoForm').onsubmit = savePromo;
+
+      document.getElementById('btnOpenStore').onclick = () => {
+        if (myStore?.slug) window.open('/tienda/' + myStore.slug, '_blank');
+        else { toast('Configura el slug de tu tienda primero'); showSection('store'); }
+      };
+      document.getElementById('btnGenStoreQr').onclick = genStoreQr;
+    }
+
+    async function loadMyStore() {
+      if (!window.sb) return;
+      const { data } = await sb.from('stores').select('*').eq('owner_id', Auth.getUser().id).maybeSingle();
+      myStore = data;
+    }
+
+    async function loadProducts() {
+      if (!myStore || !window.sb) { myProducts = []; return; }
+      const { data } = await sb.from('products').select('*').eq('store_id', myStore.id).order('created_at', { ascending: false });
+      myProducts = data || [];
+    }
+
+    async function loadOrders() {
+      if (!myStore || !window.sb) { myOrders = []; return; }
+      const { data } = await sb.from('orders').select('*, profiles(full_name, phone), order_items(*)').eq('store_id', myStore.id).order('created_at', { ascending: false });
+      myOrders = data || [];
+    }
+
+    async function loadPromos() {
+      if (!myStore || !window.sb) { myPromos = []; return; }
+      const { data } = await sb.from('promo_codes').select('*').eq('store_id', myStore.id).order('created_at', { ascending: false });
+      myPromos = data || [];
     }
 
     function renderDashboard() {
-      document.getElementById('statProducts').textContent = sellerProducts.length;
-      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
-      const pending = orders.filter(o => o.status === 'pendiente').length;
+      document.getElementById('statProducts').textContent = myProducts.length;
+      const pending = myOrders.filter(o => o.status === 'pendiente').length;
       document.getElementById('statPending').textContent = pending;
-      const sales = orders.reduce((s, o) => s + (o.total || 0), 0);
+      const payPend = myOrders.filter(o => o.payment_status === 'marcado_pagado').length;
+      document.getElementById('statPayPending').textContent = payPend;
+      const sales = myOrders.filter(o => o.status !== 'cancelado').reduce((s, o) => s + Number(o.total || 0), 0);
       document.getElementById('statSales').textContent = formatPrice(sales);
-      document.getElementById('statMsgs').textContent = '0';
 
       const tbody = document.getElementById('recentOrdersBody');
-      if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No hay pedidos aún</td></tr>';
-      } else {
-        tbody.innerHTML = orders.slice(0, 5).map(o => `
-          <tr>
-            <td>#${o.id.slice(-6)}</td>
-            <td>Cliente</td>
-            <td>${formatPrice(o.total)}</td>
-            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-            <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
-            <td>
-              ${o.status === 'pendiente' ? `<button class="btn btn-sm btn-primary" onclick="acceptOrder('${o.id}')">Aceptar</button>` : '—'}
-            </td>
-          </tr>
-        `).join('');
-      }
-    }
-
-    function renderSellerProducts() {
-      const tbody = document.getElementById('productsBody');
-      if (sellerProducts.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No tienes productos. ¡Crea el primero!</td></tr>';
+      if (!myOrders.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr>';
         return;
       }
-      tbody.innerHTML = sellerProducts.map((p, i) => `
+      tbody.innerHTML = myOrders.slice(0, 6).map(o => {
+        const name = o.profiles?.full_name || o.payer_name || 'Cliente';
+        const pay = o.payment_status || 'pendiente';
+        return `<tr>
+          <td>#${String(o.id).slice(-6)}</td>
+          <td>${name}</td>
+          <td>${formatPrice(o.total)}</td>
+          <td><span class="status-badge status-${pay === 'confirmado' ? 'aceptado' : pay === 'marcado_pagado' ? 'enviado' : 'pendiente'}">${pay}</span></td>
+          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+          <td>${o.status === 'pendiente' ? `<button class="btn btn-sm btn-primary" onclick="acceptOrder('${o.id}')">Aceptar</button>` : ''}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderProducts() {
+      const tbody = document.getElementById('productsBody');
+      if (!myProducts.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No tienes productos. ¡Crea el primero!</td></tr>';
+        return;
+      }
+      tbody.innerHTML = myProducts.map(p => `
         <tr>
-          <td><img src="${p.image}" style="width:40px;height:40px;border-radius:4px;object-fit:cover"></td>
-          <td>${p.name}</td>
+          <td><img src="${p.image || 'https://via.placeholder.com/40'}" style="width:36px;height:36px;border-radius:4px;object-fit:cover"></td>
+          <td>${p.name}${p.old_price ? ' <small style="color:var(--danger)">-%</small>' : ''}</td>
           <td>${formatPrice(p.price)}</td>
           <td>${p.stock}</td>
-          <td>${p.category}</td>
           <td>
-            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${i})"><i class="fas fa-trash"></i></button>
+            <button class="btn btn-sm btn-outline" onclick="editProduct('${p.id}')"><i class="fas fa-edit"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteProduct('${p.id}')"><i class="fas fa-trash"></i></button>
           </td>
-        </tr>
-      `).join('');
+        </tr>`).join('');
     }
 
-    function renderSellerOrders() {
-      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+    function renderOrders() {
+      const alerts = document.getElementById('paymentAlerts');
+      const marked = myOrders.filter(o => o.payment_status === 'marcado_pagado');
+      alerts.innerHTML = marked.map(o => `
+        <div class="payment-alert">
+          <strong>Pago marcado por cliente</strong> — Pedido #${String(o.id).slice(-6)}<br>
+          Nombre: ${o.payer_name || o.profiles?.full_name || '—'} · Tel: ${o.payer_phone || o.profiles?.phone || '—'}<br>
+          ${o.payment_note ? 'Nota: ' + o.payment_note + '<br>' : ''}
+          <button class="btn btn-sm btn-primary" style="margin-top:6px" onclick="confirmPayment('${o.id}')">Confirmar pago</button>
+          <button class="btn btn-sm btn-outline" style="margin-top:6px" onclick="rejectPayment('${o.id}')">Rechazar</button>
+        </div>`).join('');
+
       const tbody = document.getElementById('ordersBody');
-      if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>';
+      if (!myOrders.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr>';
         return;
       }
-      tbody.innerHTML = orders.map(o => `
-        <tr>
-          <td>#${o.id.slice(-6)}</td>
-          <td>Cliente</td>
-          <td>${(o.items || []).length} items</td>
+      tbody.innerHTML = myOrders.map(o => {
+        const name = o.payer_name || o.profiles?.full_name || 'Cliente';
+        const phone = o.payer_phone || o.profiles?.phone || '—';
+        return `<tr>
+          <td>#${String(o.id).slice(-6)}</td>
+          <td>${name}<br><small>${phone}</small></td>
           <td>${formatPrice(o.total)}</td>
+          <td>${o.payment_status || 'pendiente'}</td>
           <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-          <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
           <td>
-            ${o.status === 'pendiente' ? `
-              <button class="btn btn-sm btn-primary" onclick="acceptOrder('${o.id}')">Aceptar</button>
-              <button class="btn btn-sm btn-danger" onclick="rejectOrder('${o.id}')">Rechazar</button>
-            ` : o.status}
+            ${o.status === 'pendiente' ? `<button class="btn btn-sm btn-primary" onclick="acceptOrder('${o.id}')">Aceptar</button>` : ''}
+            ${o.payment_status === 'marcado_pagado' ? `<button class="btn btn-sm btn-secondary" onclick="confirmPayment('${o.id}')">Confirmar $</button>` : ''}
           </td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
     }
 
-    function acceptOrder(id) {
-      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
-      const o = orders.find(x => x.id === id);
-      if (o) {
-        o.status = 'aceptado';
-        localStorage.setItem('mp_orders', JSON.stringify(orders));
-        // Notificar al cliente
-        const notifs = JSON.parse(localStorage.getItem('mp_notifications') || '[]');
-        notifs.unshift({
-          id: Date.now(),
-          title: 'Pedido aceptado',
-          body: `Tu pedido #${id.slice(-6)} fue aceptado por el vendedor.`,
-          time: 'Ahora',
-          read: false,
-          type: 'order',
-        });
-        localStorage.setItem('mp_notifications', JSON.stringify(notifs));
-        toast('Pedido aceptado', 'success');
-        renderDashboard();
-        renderSellerOrders();
+    function renderPromos() {
+      const tbody = document.getElementById('promosBody');
+      if (!myPromos.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin códigos aún</td></tr>';
+        return;
+      }
+      tbody.innerHTML = myPromos.map(p => `
+        <tr>
+          <td><strong>${p.code}</strong></td>
+          <td>${p.discount_percent ? p.discount_percent + '%' : formatPrice(p.discount_amount || 0)}</td>
+          <td>${p.used_count || 0}${p.max_uses ? ' / ' + p.max_uses : ''}</td>
+          <td>${p.active ? 'Sí' : 'No'}</td>
+          <td><button class="btn btn-sm btn-danger" onclick="deletePromo('${p.id}')"><i class="fas fa-trash"></i></button></td>
+        </tr>`).join('');
+    }
+
+    function fillStoreForm() {
+      if (!myStore) return;
+      document.getElementById('storeName').value = myStore.name || '';
+      document.getElementById('storeSlug').value = myStore.slug || '';
+      document.getElementById('storeDesc').value = myStore.description || '';
+      document.getElementById('storeCategory').value = myStore.category || 'general';
+      document.getElementById('storeLogo').value = myStore.logo || '';
+      document.getElementById('storeBanner').value = myStore.banner || '';
+      updateStoreLinkPreview();
+      if (myStore.slug) genStoreQr();
+    }
+
+    function fillPaymentForm() {
+      if (!myStore) return;
+      document.getElementById('payMethod').value = myStore.payment_method || '';
+      document.getElementById('payPhone').value = myStore.payment_phone || '';
+      document.getElementById('payCard').value = myStore.payment_card || '';
+      document.getElementById('payQrUrl').value = myStore.payment_qr_url || '';
+      const img = document.getElementById('payQrPreview');
+      if (myStore.payment_qr_url) { img.src = myStore.payment_qr_url; img.style.display = 'block'; }
+    }
+
+    function updateStoreLinkPreview() {
+      const slug = document.getElementById('storeSlug').value || '—';
+      document.getElementById('storeLinkPreview').textContent = 'Tu tienda: ' + location.origin + '/tienda/' + slug;
+    }
+
+    function genStoreQr() {
+      const slug = (myStore?.slug || document.getElementById('storeSlug').value || '').trim();
+      if (!slug) { toast('Define el slug primero'); return; }
+      const url = encodeURIComponent(location.origin + '/tienda/' + slug);
+      const img = document.getElementById('storeQrImg');
+      img.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${url}`;
+      img.style.display = 'block';
+    }
+
+    async function saveStore(e) {
+      e.preventDefault();
+      if (!window.sb) { toast('Sin conexión a Supabase', 'error'); return; }
+      const payload = {
+        name: document.getElementById('storeName').value.trim(),
+        slug: document.getElementById('storeSlug').value.trim().toLowerCase(),
+        description: document.getElementById('storeDesc').value.trim() || null,
+        category: document.getElementById('storeCategory').value,
+        logo: document.getElementById('storeLogo').value.trim() || null,
+        banner: document.getElementById('storeBanner').value.trim() || null,
+        owner_id: Auth.getUser().id,
+        active: true,
+      };
+      try {
+        if (myStore) {
+          const { data, error } = await sb.from('stores').update(payload).eq('id', myStore.id).select().single();
+          if (error) throw error;
+          myStore = data;
+        } else {
+          const { data, error } = await sb.from('stores').insert(payload).select().single();
+          if (error) throw error;
+          myStore = data;
+        }
+        toast('Tienda guardada', 'success');
+        updateStoreLinkPreview();
+        genStoreQr();
+      } catch (err) {
+        toast(err.message || 'Error al guardar', 'error');
       }
     }
 
-    function rejectOrder(id) {
-      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
-      const o = orders.find(x => x.id === id);
-      if (o) {
-        o.status = 'cancelado';
-        localStorage.setItem('mp_orders', JSON.stringify(orders));
-        toast('Pedido cancelado');
-        renderDashboard();
-        renderSellerOrders();
+    async function savePayments(e) {
+      e.preventDefault();
+      if (!myStore) { toast('Primero configura tu tienda', 'error'); showSection('store'); return; }
+      const payload = {
+        payment_method: document.getElementById('payMethod').value || null,
+        payment_phone: document.getElementById('payPhone').value.trim() || null,
+        payment_card: document.getElementById('payCard').value.trim() || null,
+        payment_qr_url: document.getElementById('payQrUrl').value.trim() || null,
+      };
+      try {
+        const { data, error } = await sb.from('stores').update(payload).eq('id', myStore.id).select().single();
+        if (error) throw error;
+        myStore = data;
+        toast('Configuración de pago guardada', 'success');
+      } catch (err) {
+        toast(err.message || 'Error', 'error');
       }
     }
 
-    function deleteProduct(i) {
+    async function saveProduct(e) {
+      e.preventDefault();
+      if (!myStore) { toast('Configura tu tienda primero', 'error'); showSection('store'); return; }
+      const editId = document.getElementById('prodEditId').value;
+      const payload = {
+        store_id: myStore.id,
+        name: document.getElementById('prodName').value.trim(),
+        description: document.getElementById('prodDesc').value.trim() || null,
+        price: +document.getElementById('prodPrice').value,
+        old_price: document.getElementById('prodOldPrice').value ? +document.getElementById('prodOldPrice').value : null,
+        stock: +document.getElementById('prodStock').value || 0,
+        category: document.getElementById('prodCategory').value,
+        image: document.getElementById('prodImage').value.trim() || null,
+        active: true,
+      };
+      try {
+        if (editId) {
+          const { error } = await sb.from('products').update(payload).eq('id', editId);
+          if (error) throw error;
+        } else {
+          const { error } = await sb.from('products').insert(payload);
+          if (error) throw error;
+        }
+        toast('Producto guardado', 'success');
+        document.getElementById('productFormWrap').classList.add('hidden');
+        await loadProducts();
+        renderProducts();
+        renderDashboard();
+      } catch (err) {
+        toast(err.message || 'Error', 'error');
+      }
+    }
+
+    window.editProduct = function(id) {
+      const p = myProducts.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById('prodEditId').value = p.id;
+      document.getElementById('prodName').value = p.name;
+      document.getElementById('prodDesc').value = p.description || '';
+      document.getElementById('prodPrice').value = p.price;
+      document.getElementById('prodOldPrice').value = p.old_price || '';
+      document.getElementById('prodStock').value = p.stock;
+      document.getElementById('prodCategory').value = p.category || 'otros';
+      document.getElementById('prodImage').value = p.image || '';
+      document.getElementById('formTitle').textContent = 'Editar producto';
+      document.getElementById('productFormWrap').classList.remove('hidden');
+    };
+
+    window.deleteProduct = async function(id) {
       if (!confirm('¿Eliminar este producto?')) return;
-      sellerProducts.splice(i, 1);
-      localStorage.setItem('mp_seller_products', JSON.stringify(sellerProducts));
-      renderSellerProducts();
+      const { error } = await sb.from('products').delete().eq('id', id);
+      if (error) { toast(error.message, 'error'); return; }
+      toast('Eliminado');
+      await loadProducts();
+      renderProducts();
       renderDashboard();
-      toast('Producto eliminado');
+    };
+
+    window.acceptOrder = async function(id) {
+      const { error } = await sb.from('orders').update({ status: 'aceptado', updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) { toast(error.message, 'error'); return; }
+      toast('Pedido aceptado', 'success');
+      await loadOrders();
+      renderOrders();
+      renderDashboard();
+    };
+
+    window.confirmPayment = async function(id) {
+      const { error } = await sb.from('orders').update({ payment_status: 'confirmado', status: 'aceptado', updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) { toast(error.message, 'error'); return; }
+      toast('Pago confirmado', 'success');
+      await loadOrders();
+      renderOrders();
+      renderDashboard();
+    };
+
+    window.rejectPayment = async function(id) {
+      const { error } = await sb.from('orders').update({ payment_status: 'rechazado', updated_at: new Date().toISOString() }).eq('id', id);
+      if (error) { toast(error.message, 'error'); return; }
+      toast('Pago rechazado');
+      await loadOrders();
+      renderOrders();
+      renderDashboard();
+    };
+
+    async function savePromo(e) {
+      e.preventDefault();
+      if (!myStore) { toast('Configura tu tienda primero', 'error'); return; }
+      const code = document.getElementById('promoCode').value.trim().toUpperCase();
+      const percent = document.getElementById('promoPercent').value ? +document.getElementById('promoPercent').value : null;
+      const amount = document.getElementById('promoAmount').value ? +document.getElementById('promoAmount').value : null;
+      if (!percent && !amount) { toast('Indica % o monto de descuento', 'error'); return; }
+      try {
+        const { error } = await sb.from('promo_codes').insert({
+          store_id: myStore.id,
+          code,
+          discount_percent: percent,
+          discount_amount: amount,
+          max_uses: document.getElementById('promoMax').value ? +document.getElementById('promoMax').value : null,
+          active: true,
+        });
+        if (error) throw error;
+        toast('Código creado', 'success');
+        document.getElementById('promoFormWrap').classList.add('hidden');
+        await loadPromos();
+        renderPromos();
+      } catch (err) {
+        toast(err.message || 'Error', 'error');
+      }
     }
+
+    window.deletePromo = async function(id) {
+      if (!confirm('¿Eliminar código?')) return;
+      await sb.from('promo_codes').delete().eq('id', id);
+      await loadPromos();
+      renderPromos();
+      toast('Eliminado');
+    };
 
     document.addEventListener('DOMContentLoaded', init);
   </script>
