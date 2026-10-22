@@ -17,6 +17,20 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 12px 16px; margin-top: 12px;
+      background: #fff; color: #333; border: 1px solid #dadce0;
+      border-radius: 8px; font-weight: 500; font-size: 0.95rem;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-google:hover { background: #f8f9fa; }
+    .btn-google img { width: 20px; height: 20px; }
+    .auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; color: var(--text-muted); font-size: 0.8rem; }
+    .auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .seller-request-form .form-group { margin-bottom: 12px; }
+  </style>
 </head>
 <body>
   <div id="appSplash" class="app-splash">
@@ -150,13 +164,59 @@
             <button type="submit" class="btn btn-primary">Guardar cambios</button>
           </form>
         </div>
+
         <div class="profile-card">
           <h3><i class="fas fa-store"></i> Convertirme en vendedor</h3>
           <p>Vende tus productos en Mi Vitrina. Completa la solicitud y un admin la revisará.</p>
           <div id="sellerRequestStatus">
             <button class="btn btn-secondary" id="btnRequestSeller">Solicitar ser vendedor</button>
           </div>
+          <div id="sellerRequestFormWrap" class="hidden seller-request-form" style="margin-top:16px">
+            <form id="sellerRequestForm">
+              <div class="form-group">
+                <label>Nombre de la tienda *</label>
+                <input type="text" id="reqStoreName" required placeholder="Mi Tienda">
+              </div>
+              <div class="form-group">
+                <label>Descripción (opcional)</label>
+                <textarea id="reqStoreDesc" rows="2" placeholder="Qué vendes..."></textarea>
+              </div>
+              <div class="form-group">
+                <label>Categoría *</label>
+                <select id="reqStoreCategory" required>
+                  <option value="general">General</option>
+                  <option value="electronica">Electrónica</option>
+                  <option value="ropa">Ropa</option>
+                  <option value="hogar">Hogar</option>
+                  <option value="alimentos">Alimentos</option>
+                  <option value="servicios">Servicios</option>
+                  <option value="belleza">Belleza</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>URL imagen de perfil / logo</label>
+                <input type="url" id="reqStoreLogo" placeholder="https://...">
+              </div>
+              <div class="form-group">
+                <label>URL banner</label>
+                <input type="url" id="reqStoreBanner" placeholder="https://...">
+              </div>
+              <div style="display:flex;gap:8px">
+                <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+                <button type="button" class="btn btn-outline" id="cancelSellerReq">Cancelar</button>
+              </div>
+            </form>
+          </div>
         </div>
+
+        <div class="profile-card">
+          <h3><i class="fas fa-handshake"></i> Gestores de venta / Referidos</h3>
+          <p id="referralCodeBox" style="font-size:0.9rem;margin-bottom:12px">Tu código de referido aparecerá aquí al iniciar sesión.</p>
+          <div id="managerRequestStatus">
+            <button class="btn btn-secondary" id="btnRequestManager">Solicitar ser gestor de ventas</button>
+          </div>
+        </div>
+
         <div class="profile-card">
           <h3><i class="fas fa-cog"></i> Configuración de la app</h3>
           <div class="setting-item">
@@ -247,6 +307,11 @@
           <input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password">
         </div>
         <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+        <div class="auth-divider">o continúa con</div>
+        <button type="button" class="btn-google" id="btnGoogleLogin">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+          Continuar con Google
+        </button>
       </form>
       <form id="registerForm" class="auth-form hidden">
         <div class="form-group">
@@ -266,6 +331,11 @@
           <input type="password" id="regPassword2" required placeholder="Repite la contraseña" autocomplete="new-password">
         </div>
         <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+        <div class="auth-divider">o regístrate con</div>
+        <button type="button" class="btn-google" id="btnGoogleRegister">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+          Continuar con Google
+        </button>
         <p class="auth-note">Al registrarte aceptas los términos de uso.</p>
       </form>
     </div>
