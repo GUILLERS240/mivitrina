@@ -1,0 +1,212 @@
+/* Mi Vitrina — correcciones móviles + splash */
+html { -webkit-text-size-adjust: 100%; height: 100%; }
+body {
+  min-height: 100%;
+  min-height: 100dvh;
+  padding-bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+  overflow-x: hidden;
+}
+
+.header {
+  padding: 0 10px;
+  padding-top: env(safe-area-inset-top, 0px);
+  gap: 8px;
+}
+
+.logo { white-space: nowrap; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
+.logo-img { width: 32px; height: 32px; object-fit: contain; border-radius: 6px; display: block; background: #0a0a0a; }
+.search-bar { min-width: 0; height: 36px; padding: 0 10px; }
+
+.bottom-nav {
+  height: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 200;
+}
+
+.nav-item {
+  font-size: 0.65rem;
+  min-width: 0;
+  padding: 6px 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-item span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .logo span { display: none; }
+  .logo { font-size: 1.25rem; }
+
+  .auth-actions .btn {
+    padding: 8px 10px;
+    font-size: 0.75rem;
+  }
+  .auth-actions .btn-outline { display: none; }
+
+  .header-right .icon-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1rem;
+  }
+
+  .search-bar { height: 34px; padding: 0 8px; }
+  .search-bar input { font-size: 0.9rem; }
+
+  .main-content { padding: 12px; }
+  .section-header h1 { font-size: 1.15rem; }
+
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .product-card .add-btn {
+    font-size: 0.75rem;
+    padding: 8px;
+  }
+
+  .stores-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .side-panel {
+    max-width: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .modal {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .modal-content {
+    max-width: 100%;
+    border-radius: 16px 16px 0 0;
+    max-height: 92vh;
+    padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #toastContainer {
+    bottom: calc(var(--bottom-nav-h) + env(safe-area-inset-bottom, 0px) + 12px);
+  }
+
+  .desktop-only { display: none !important; }
+  .mobile-only-block { display: block !important; }
+
+  .header {
+    flex-wrap: nowrap;
+    overflow: hidden;
+  }
+  .header-right {
+    gap: 2px;
+    max-width: 42%;
+  }
+  .user-actions {
+    gap: 0;
+  }
+  .search-bar {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .auth-actions .btn-primary {
+    padding: 7px 10px;
+    font-size: 0.72rem;
+  }
+  .badge[data-count="0"],
+  .badge:empty {
+    display: none !important;
+  }
+  .product-card .title {
+    word-break: break-word;
+  }
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .filters {
+    width: 100%;
+  }
+  .filters select {
+    flex: 1;
+    min-width: 0;
+  }
+  .side-panel {
+    height: 100%;
+    height: 100dvh;
+  }
+  .messages-layout {
+    height: calc(100% - 56px);
+  }
+}
+
+.desktop-only { }
+.mobile-only-block { display: none; }
+
+/* ===== SPLASH ===== */
+.app-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0a0a0a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.45s ease, visibility 0.45s ease;
+}
+.app-splash.hide {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.splash-inner { text-align: center; }
+.splash-logo {
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  animation: splashPulse 1.4s ease-in-out infinite;
+  border-radius: 20px;
+}
+.splash-spinner {
+  width: 36px;
+  height: 36px;
+  margin: 20px auto 0;
+  border: 3px solid rgba(255,153,0,0.25);
+  border-top-color: #ff9900;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+.splash-text {
+  margin-top: 14px;
+  color: #ff9900;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: 0.04em;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes splashPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.06); opacity: 0.9; }
+}
+
+/* Skeleton shimmer mejorado */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--border) 30%,
+    rgba(255,153,0,0.15) 50%,
+    var(--border) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.2s ease-in-out infinite;
+}
+.skeleton-card { animation: cardIn 0.35s ease both; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
