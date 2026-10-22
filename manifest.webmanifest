@@ -1,20 +1,18 @@
 {
   "name": "Mi Vitrina",
   "short_name": "Mi Vitrina",
-  "description": "Marketplace online: clientes y vendedores en la misma plataforma",
+  "description": "Marketplace online para clientes y vendedores",
   "start_url": "/",
-  "scope": "/",
   "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
   "orientation": "portrait-primary",
-  "background_color": "#232f3e",
-  "theme_color": "#232f3e",
-  "lang": "es",
   "icons": [
     {
-      "src": "/icon.svg",
+      "src": "icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
