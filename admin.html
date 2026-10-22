@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - MercadoPlus</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .admin-layout { display: flex; min-height: 100vh; }
+    .admin-sidebar {
+      width: 240px;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    .admin-sidebar .logo {
+      padding: 0 20px 24px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .admin-sidebar .logo i { color: #e94560; }
+    .admin-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .admin-nav a:hover, .admin-nav a.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .admin-nav a.active { border-left: 3px solid #e94560; }
+    .admin-main { flex: 1; background: var(--bg); overflow-y: auto; }
+    .admin-header {
+      background: var(--bg-card);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-content { padding: 24px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
+    .stat-card .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--bg); font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
+    td { font-size: 0.9rem; }
+    .access-denied {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 24px;
+    }
+    .access-denied i { font-size: 4rem; color: var(--danger); margin-bottom: 16px; }
+    @media (max-width: 768px) {
+      .admin-layout { flex-direction: column; }
+      .admin-sidebar { width: 100%; }
+      .admin-nav { display: flex; overflow-x: auto; }
+      .admin-nav a { white-space: nowrap; border-left: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="accessDenied" class="access-denied hidden">
+    <i class="fas fa-shield-alt"></i>
+    <h1>Acceso denegado</h1>
+    <p>Solo el administrador autorizado puede acceder a este panel.</p>
+    <p style="color:var(--text-muted);margin:8px 0 20px">Correo autorizado: guillers240@gmail.com</p>
+    <a href="index.html" class="btn btn-primary">Volver a la tienda</a>
+  </div>
+
+  <div id="adminApp" class="admin-layout hidden">
+    <aside class="admin-sidebar">
+      <div class="logo"><i class="fas fa-shield-alt"></i> Admin Panel</div>
+      <nav class="admin-nav">
+        <a href="#" class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="#" data-section="users"><i class="fas fa-users"></i> Usuarios</a>
+        <a href="#" data-section="sellers"><i class="fas fa-store"></i> Solicitudes Vendedor</a>
+        <a href="#" data-section="stores"><i class="fas fa-shop"></i> Tiendas</a>
+        <a href="#" data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
+        <a href="#" data-section="settings"><i class="fas fa-cog"></i> Configuración</a>
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
+      </nav>
+    </aside>
+
+    <div class="admin-main">
+      <div class="admin-header">
+        <h2 id="sectionTitle">Dashboard</h2>
+        <div>
+          <span style="color:var(--text-muted);font-size:0.85rem">Admin:</span>
+          <strong id="adminEmail"></strong>
+        </div>
+      </div>
+
+      <div class="admin-content">
+        <!-- Dashboard -->
+        <section id="sec-dashboard" class="admin-section active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Usuarios registrados</div>
+              <div class="stat-value" id="statUsers">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Tiendas activas</div>
+              <div class="stat-value" id="statStores">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Productos</div>
+              <div class="stat-value" id="statProducts">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Pedidos totales</div>
+              <div class="stat-value" id="statOrders">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Solicitudes pendientes</div>
+              <div class="stat-value" id="statRequests">0</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Usuarios -->
+        <section id="sec-users" class="admin-section">
+          <h3 style="margin-bottom:16px">Usuarios registrados</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Teléfono</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="usersBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Solicitudes vendedor -->
+        <section id="sec-sellers" class="admin-section">
+          <h3 style="margin-bottom:16px">Solicitudes para ser vendedor</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Usuario</th><th>Nombre tienda</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="requestsBody">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay solicitudes</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Tiendas -->
+        <section id="sec-stores" class="admin-section">
+          <h3 style="margin-bottom:16px">Todas las tiendas</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nombre</th><th>Descripción</th><th>Productos</th><th>Rating</th><th>Estado</th></tr>
+              </thead>
+              <tbody id="storesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Pedidos -->
+        <section id="sec-orders" class="admin-section">
+          <h3 style="margin-bottom:16px">Todos los pedidos</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Items</th></tr>
+              </thead>
+              <tbody id="ordersBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Settings -->
+        <section id="sec-settings" class="admin-section">
+          <h3 style="margin-bottom:16px">Configuración general</h3>
+          <div class="product-form" style="background:var(--bg-card);padding:24px;border-radius:8px;box-shadow:var(--shadow);max-width:500px">
+            <div class="form-group">
+              <label>Nombre del sitio</label>
+              <input type="text" value="MercadoPlus" id="siteName">
+            </div>
+            <div class="form-group">
+              <label>Correo de soporte</label>
+              <input type="email" value="soporte@mercadoplus.com" id="supportEmail">
+            </div>
+            <div class="form-group">
+              <label>Modo mantenimiento</label>
+              <label class="switch">
+                <input type="checkbox" id="maintenanceMode">
+                <span class="slider"></span>
+              </label>
+            </div>
+            <button class="btn btn-primary" onclick="toast('Configuración guardada (demo)','success')">Guardar</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    function toast(msg, type='') {
+      const c = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    function formatPrice(n) {
+      return '$' + Number(n).toLocaleString('es-CO');
+    }
+
+    async function init() {
+      await Auth.init();
+
+      // SOLO el correo admin tiene acceso
+      if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
+        document.getElementById('accessDenied').classList.remove('hidden');
+        return;
+      }
+
+      document.getElementById('adminApp').classList.remove('hidden');
+      document.getElementById('adminEmail').textContent = Auth.getUser().email;
+
+      // Navegación
+      document.querySelectorAll('.admin-nav a[data-section]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.querySelectorAll('.admin-nav a').forEach(x => x.classList.remove('active'));
+          a.classList.add('active');
+          document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+          document.getElementById('sec-' + a.dataset.section).classList.add('active');
+          document.getElementById('sectionTitle').textContent = a.textContent.trim();
+          if (a.dataset.section === 'users') renderUsers();
+          if (a.dataset.section === 'sellers') renderRequests();
+          if (a.dataset.section === 'stores') renderStores();
+          if (a.dataset.section === 'orders') renderOrders();
+        });
+      });
+
+      renderDashboard();
+    }
+
+    function renderDashboard() {
+      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
+      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+      const req = localStorage.getItem('mp_seller_request');
+
+      document.getElementById('statUsers').textContent = users.length;
+      document.getElementById('statStores').textContent = MOCK_STORES.length;
+      document.getElementById('statProducts').textContent = MOCK_PRODUCTS.length;
+      document.getElementById('statOrders').textContent = orders.length;
+      document.getElementById('statRequests').textContent = req ? 1 : 0;
+    }
+
+    function renderUsers() {
+      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
+      const tbody = document.getElementById('usersBody');
+      if (users.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay usuarios</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+          <td><span class="status-badge ${u.role === 'admin' ? 'status-aceptado' : u.role === 'seller' ? 'status-enviado' : 'status-pendiente'}">${u.role}</span></td>
+          <td>${u.phone || '—'}</td>
+          <td>
+            ${u.role !== 'admin' ? `<button class="btn btn-sm btn-secondary" onclick="makeSeller('${u.id}')">Hacer vendedor</button>` : '—'}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderRequests() {
+      const req = localStorage.getItem('mp_seller_request');
+      const tbody = document.getElementById('requestsBody');
+      if (!req) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay solicitudes</td></tr>';
+        return;
+      }
+      const r = JSON.parse(req);
+      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
+      const user = users.find(u => u.id === r.user_id) || { name: 'Usuario', email: '—' };
+      tbody.innerHTML = `
+        <tr>
+          <td>${user.name} (${user.email || r.user_id})</td>
+          <td>${r.store_name || '—'}</td>
+          <td>${new Date(r.created_at).toLocaleDateString('es-CO')}</td>
+          <td><span class="status-badge status-${r.status}">${r.status}</span></td>
+          <td>
+            ${r.status === 'pendiente' ? `
+              <button class="btn btn-sm btn-primary" onclick="approveSeller()">Aprobar</button>
+              <button class="btn btn-sm btn-danger" onclick="rejectSeller()">Rechazar</button>
+            ` : r.status}
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderStores() {
+      const tbody = document.getElementById('storesBody');
+      tbody.innerHTML = MOCK_STORES.map(s => `
+        <tr>
+          <td>${s.name}</td>
+          <td>${s.description}</td>
+          <td>${s.products_count}</td>
+          <td>${s.rating} ★</td>
+          <td><span class="status-badge status-aceptado">Activa</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderOrders() {
+      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+      const tbody = document.getElementById('ordersBody');
+      if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>';
+        return;
+      }
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td>#${o.id.slice(-8)}</td>
+          <td>${formatPrice(o.total)}</td>
+          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+          <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
+          <td>${(o.items || []).length}</td>
+        </tr>
+      `).join('');
+    }
+
+    function approveSeller() {
+      const req = JSON.parse(localStorage.getItem('mp_seller_request'));
+      req.status = 'aprobado';
+      localStorage.setItem('mp_seller_request', JSON.stringify(req));
+      // Actualizar rol del usuario
+      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
+      const u = users.find(x => x.id === req.user_id);
+      if (u) {
+        u.role = 'seller';
+        localStorage.setItem('mp_users', JSON.stringify(users));
+      }
+      // Si es el usuario actual
+      if (Auth.currentUser && Auth.currentUser.id === req.user_id) {
+        Auth.currentUser.role = 'seller';
+        localStorage.setItem('mp_user', JSON.stringify(Auth.currentUser));
+      }
+      toast('Vendedor aprobado', 'success');
+      renderRequests();
+      renderDashboard();
+    }
+
+    function rejectSeller() {
+      const req = JSON.parse(localStorage.getItem('mp_seller_request'));
+      req.status = 'rechazado';
+      localStorage.setItem('mp_seller_request', JSON.stringify(req));
+      toast('Solicitud rechazada');
+      renderRequests();
+    }
+
+    function makeSeller(userId) {
+      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
+      const u = users.find(x => x.id === userId);
+      if (u) {
+        u.role = 'seller';
+        localStorage.setItem('mp_users', JSON.stringify(users));
+        toast(`${u.name} ahora es vendedor`, 'success');
+        renderUsers();
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

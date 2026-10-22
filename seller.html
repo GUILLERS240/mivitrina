@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Vendedor - MercadoPlus</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .seller-layout { display: flex; min-height: 100vh; }
+    .seller-sidebar {
+      width: 240px;
+      background: var(--secondary);
+      color: #fff;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    .seller-sidebar .logo {
+      padding: 0 20px 24px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .seller-sidebar .logo i { color: var(--primary); }
+    .seller-nav a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.7);
+      font-size: 0.9rem;
+      transition: all 0.2s;
+    }
+    .seller-nav a:hover, .seller-nav a.active {
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+    }
+    .seller-nav a.active { border-left: 3px solid var(--primary); }
+    .seller-main { flex: 1; background: var(--bg); overflow-y: auto; }
+    .seller-header {
+      background: var(--bg-card);
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .seller-content { padding: 24px; }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
+    .stat-card .stat-label { font-size: 0.85rem; color: var(--text-muted); }
+    .seller-section { display: none; }
+    .seller-section.active { display: block; }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { background: var(--bg); font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
+    td { font-size: 0.9rem; }
+    .product-form {
+      background: var(--bg-card);
+      padding: 24px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      max-width: 600px;
+    }
+    @media (max-width: 768px) {
+      .seller-layout { flex-direction: column; }
+      .seller-sidebar { width: 100%; }
+      .seller-nav { display: flex; overflow-x: auto; }
+      .seller-nav a { white-space: nowrap; border-left: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="seller-layout">
+    <aside class="seller-sidebar">
+      <div class="logo"><i class="fas fa-store"></i> Panel Vendedor</div>
+      <nav class="seller-nav">
+        <a href="#" class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a href="#" data-section="products"><i class="fas fa-box"></i> Productos</a>
+        <a href="#" data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
+        <a href="#" data-section="messages"><i class="fas fa-comments"></i> Mensajes</a>
+        <a href="#" data-section="store"><i class="fas fa-cog"></i> Mi Tienda</a>
+        <a href="index.html"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
+      </nav>
+    </aside>
+
+    <div class="seller-main">
+      <div class="seller-header">
+        <h2 id="sectionTitle">Dashboard</h2>
+        <div>
+          <span id="sellerName">Vendedor</span>
+          <a href="index.html" class="btn btn-sm btn-outline" style="margin-left:12px;border-color:var(--border);color:var(--text)">Salir</a>
+        </div>
+      </div>
+
+      <div class="seller-content">
+        <!-- Dashboard -->
+        <section id="sec-dashboard" class="seller-section active">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-label">Productos</div>
+              <div class="stat-value" id="statProducts">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Pedidos pendientes</div>
+              <div class="stat-value" id="statPending">0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Ventas del mes</div>
+              <div class="stat-value" id="statSales">$0</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Mensajes sin leer</div>
+              <div class="stat-value" id="statMsgs">0</div>
+            </div>
+          </div>
+          <h3 style="margin-bottom:12px">Últimos pedidos</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acción</th></tr>
+              </thead>
+              <tbody id="recentOrdersBody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No hay pedidos aún</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Productos -->
+        <section id="sec-products" class="seller-section">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+            <h3>Mis Productos</h3>
+            <button class="btn btn-primary" id="btnNewProduct"><i class="fas fa-plus"></i> Nuevo producto</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Imagen</th><th>Nombre</th><th>Precio</th><th>Stock</th><th>Categoría</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="productsBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Formulario nuevo producto -->
+          <div id="productFormWrap" class="hidden" style="margin-top:24px">
+            <div class="product-form">
+              <h3 id="formTitle">Nuevo producto</h3>
+              <form id="productForm">
+                <div class="form-group">
+                  <label>Nombre</label>
+                  <input type="text" id="prodName" required>
+                </div>
+                <div class="form-group">
+                  <label>Descripción</label>
+                  <textarea id="prodDesc" rows="3" required></textarea>
+                </div>
+                <div class="form-group">
+                  <label>Precio (COP)</label>
+                  <input type="number" id="prodPrice" required min="0">
+                </div>
+                <div class="form-group">
+                  <label>Precio anterior (opcional)</label>
+                  <input type="number" id="prodOldPrice" min="0">
+                </div>
+                <div class="form-group">
+                  <label>Stock</label>
+                  <input type="number" id="prodStock" required min="0" value="10">
+                </div>
+                <div class="form-group">
+                  <label>Categoría</label>
+                  <select id="prodCategory">
+                    <option value="electronica">Electrónica</option>
+                    <option value="ropa">Ropa</option>
+                    <option value="hogar">Hogar</option>
+                    <option value="deportes">Deportes</option>
+                    <option value="belleza">Belleza</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>URL de imagen</label>
+                  <input type="url" id="prodImage" placeholder="https://...">
+                </div>
+                <div style="display:flex;gap:8px">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                  <button type="button" class="btn btn-outline" id="cancelProduct" style="border-color:var(--border);color:var(--text)">Cancelar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pedidos -->
+        <section id="sec-orders" class="seller-section">
+          <h3 style="margin-bottom:16px">Pedidos de mi tienda</h3>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>ID</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="ordersBody">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Mensajes -->
+        <section id="sec-messages" class="seller-section">
+          <h3 style="margin-bottom:16px">Mensajes de clientes</h3>
+          <p style="color:var(--text-muted)">Los mensajes aparecerán aquí cuando los clientes te escriban. (Funcionalidad completa en v0.2 con Supabase Realtime)</p>
+        </section>
+
+        <!-- Mi Tienda -->
+        <section id="sec-store" class="seller-section">
+          <h3 style="margin-bottom:16px">Configuración de mi tienda</h3>
+          <div class="product-form">
+            <form id="storeForm">
+              <div class="form-group">
+                <label>Nombre de la tienda</label>
+                <input type="text" id="storeName" required>
+              </div>
+              <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="storeDesc" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary">Guardar cambios</button>
+            </form>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    // Panel Vendedor v0.1
+    const sellerProducts = JSON.parse(localStorage.getItem('mp_seller_products') || '[]');
+
+    function toast(msg, type='') {
+      const c = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+
+    function formatPrice(n) {
+      return '$' + Number(n).toLocaleString('es-CO');
+    }
+
+    async function init() {
+      await Auth.init();
+      if (!Auth.isLoggedIn()) {
+        alert('Debes iniciar sesión');
+        window.location.href = 'index.html';
+        return;
+      }
+      // En demo permitir acceso a cualquiera logueado para probar
+      // En producción: if (!Auth.isSeller()) { ... }
+
+      document.getElementById('sellerName').textContent = Auth.getUser().name;
+
+      // Navegación
+      document.querySelectorAll('.seller-nav a[data-section]').forEach(a => {
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          document.querySelectorAll('.seller-nav a').forEach(x => x.classList.remove('active'));
+          a.classList.add('active');
+          document.querySelectorAll('.seller-section').forEach(s => s.classList.remove('active'));
+          document.getElementById('sec-' + a.dataset.section).classList.add('active');
+          document.getElementById('sectionTitle').textContent = a.textContent.trim();
+          if (a.dataset.section === 'products') renderSellerProducts();
+          if (a.dataset.section === 'orders') renderSellerOrders();
+          if (a.dataset.section === 'dashboard') renderDashboard();
+        });
+      });
+
+      // Productos
+      document.getElementById('btnNewProduct').addEventListener('click', () => {
+        document.getElementById('productFormWrap').classList.remove('hidden');
+        document.getElementById('formTitle').textContent = 'Nuevo producto';
+        document.getElementById('productForm').reset();
+      });
+      document.getElementById('cancelProduct').addEventListener('click', () => {
+        document.getElementById('productFormWrap').classList.add('hidden');
+      });
+      document.getElementById('productForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const prod = {
+          id: 'sp-' + Date.now(),
+          name: document.getElementById('prodName').value,
+          description: document.getElementById('prodDesc').value,
+          price: +document.getElementById('prodPrice').value,
+          old_price: document.getElementById('prodOldPrice').value ? +document.getElementById('prodOldPrice').value : null,
+          stock: +document.getElementById('prodStock').value,
+          category: document.getElementById('prodCategory').value,
+          image: document.getElementById('prodImage').value || `https://picsum.photos/seed/${Date.now()}/400/400`,
+          store_id: 'my-store',
+          created_at: new Date().toISOString(),
+        };
+        sellerProducts.push(prod);
+        localStorage.setItem('mp_seller_products', JSON.stringify(sellerProducts));
+        // También agregarlo a MOCK para que aparezca en la tienda (demo)
+        MOCK_PRODUCTS.push(prod);
+        toast('Producto creado', 'success');
+        document.getElementById('productFormWrap').classList.add('hidden');
+        renderSellerProducts();
+        renderDashboard();
+      });
+
+      renderDashboard();
+      renderSellerProducts();
+    }
+
+    function renderDashboard() {
+      document.getElementById('statProducts').textContent = sellerProducts.length;
+      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+      const pending = orders.filter(o => o.status === 'pendiente').length;
+      document.getElementById('statPending').textContent = pending;
+      const sales = orders.reduce((s, o) => s + (o.total || 0), 0);
+      document.getElementById('statSales').textContent = formatPrice(sales);
+      document.getElementById('statMsgs').textContent = '0';
+
+      const tbody = document.getElementById('recentOrdersBody');
+      if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No hay pedidos aún</td></tr>';
+      } else {
+        tbody.innerHTML = orders.slice(0, 5).map(o => `
+          <tr>
+            <td>#${o.id.slice(-6)}</td>
+            <td>Cliente</td>
+            <td>${formatPrice(o.total)}</td>
+            <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+            <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
+            <td>
+              ${o.status === 'pendiente' ? `<button class="btn btn-sm btn-primary" onclick="acceptOrder('${o.id}')">Aceptar</button>` : '—'}
+            </td>
+          </tr>
+        `).join('');
+      }
+    }
+
+    function renderSellerProducts() {
+      const tbody = document.getElementById('productsBody');
+      if (sellerProducts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No tienes productos. ¡Crea el primero!</td></tr>';
+        return;
+      }
+      tbody.innerHTML = sellerProducts.map((p, i) => `
+        <tr>
+          <td><img src="${p.image}" style="width:40px;height:40px;border-radius:4px;object-fit:cover"></td>
+          <td>${p.name}</td>
+          <td>${formatPrice(p.price)}</td>
+          <td>${p.stock}</td>
+          <td>${p.category}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" onclick="deleteProduct(${i})"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSellerOrders() {
+      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+      const tbody = document.getElementById('ordersBody');
+      if (orders.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>';
+        return;
+      }
+      tbody.innerHTML = orders.map(o => `
+        <tr>
+          <td>#${o.id.slice(-6)}</td>
+          <td>Cliente</td>
+          <td>${(o.items || []).length} items</td>
+          <td>${formatPrice(o.total)}</td>
+          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+          <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
+          <td>
+            ${o.status === 'pendiente' ? `
+              <button class="btn btn-sm btn-primary" onclick="acceptOrder('${o.id}')">Aceptar</button>
+              <button class="btn btn-sm btn-danger" onclick="rejectOrder('${o.id}')">Rechazar</button>
+            ` : o.status}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function acceptOrder(id) {
+      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+      const o = orders.find(x => x.id === id);
+      if (o) {
+        o.status = 'aceptado';
+        localStorage.setItem('mp_orders', JSON.stringify(orders));
+        // Notificar al cliente
+        const notifs = JSON.parse(localStorage.getItem('mp_notifications') || '[]');
+        notifs.unshift({
+          id: Date.now(),
+          title: 'Pedido aceptado',
+          body: `Tu pedido #${id.slice(-6)} fue aceptado por el vendedor.`,
+          time: 'Ahora',
+          read: false,
+          type: 'order',
+        });
+        localStorage.setItem('mp_notifications', JSON.stringify(notifs));
+        toast('Pedido aceptado', 'success');
+        renderDashboard();
+        renderSellerOrders();
+      }
+    }
+
+    function rejectOrder(id) {
+      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+      const o = orders.find(x => x.id === id);
+      if (o) {
+        o.status = 'cancelado';
+        localStorage.setItem('mp_orders', JSON.stringify(orders));
+        toast('Pedido cancelado');
+        renderDashboard();
+        renderSellerOrders();
+      }
+    }
+
+    function deleteProduct(i) {
+      if (!confirm('¿Eliminar este producto?')) return;
+      sellerProducts.splice(i, 1);
+      localStorage.setItem('mp_seller_products', JSON.stringify(sellerProducts));
+      renderSellerProducts();
+      renderDashboard();
+      toast('Producto eliminado');
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>

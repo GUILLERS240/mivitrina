@@ -11,23 +11,66 @@
 - Auth con Google: NO TOCAR. Ya estaba configurado y se debe mantener.
 
 ## Qué se hizo (2026-10-22)
-1. Se eliminaron TODAS las tablas del schema `public` anteriores.
+1. Se eliminaron TODAS las tablas del schema `public` anteriores (profiles, stores,
+   products, orders, order_items, order_messages, notifications, coupons, reviews,
+   store_events, product_images, product_categories, categories, seller_applications,
+   user_roles, admin_audit_log, site_settings y enums asociados).
 2. Se dejó intacto `auth.*` y la configuración de proveedores (incluido Google).
 3. Se aplicó el schema limpio de MercadoPlus v0.1 (tablas + RLS + trigger de perfil).
 
 ## Tablas actuales (public)
-profiles, stores, products, orders, order_items, seller_requests, conversations, messages, notifications
+| Tabla              | Descripción                                      |
+|--------------------|--------------------------------------------------|
+| profiles           | Perfil del usuario (extiende auth.users)         |
+| stores             | Tiendas de vendedores                            |
+| products           | Productos                                        |
+| orders             | Pedidos                                          |
+| order_items        | Ítems de cada pedido                             |
+| seller_requests    | Solicitudes para convertirse en vendedor         |
+| conversations      | Conversaciones cliente ↔ tienda                  |
+| messages           | Mensajes del chat                                |
+| notifications      | Notificaciones in-app                            |
 
 ## Roles
 - customer (default)
 - seller
-- admin → solo guillers240@gmail.com
+- admin → solo si el email es exactamente guillers240@gmail.com (trigger handle_new_user)
 
-## Trigger
-public.handle_new_user() crea perfil y asigna admin si email es guillers240@gmail.com
+## Trigger importante
+`public.handle_new_user()` se ejecuta AFTER INSERT en auth.users y crea el perfil.
+Si el email es guillers240@gmail.com asigna role = 'admin'.
+
+## RLS (resumen)
+- profiles: lectura pública, escritura solo del dueño
+- stores / products: lectura de activos; dueño gestiona
+- orders / order_items: solo el comprador ve/crea los suyos
+- seller_requests: solo el usuario ve/crea la suya
+- notifications / conversations / messages: solo el dueño
+
+## Mejoras pendientes recomendadas (para v0.2+)
+1. Políticas RLS para vendedores:
+   - Un vendedor debe poder SELECT/UPDATE orders e order_items de su tienda.
+   - Un admin debe poder SELECT/UPDATE todo (usar role en profiles).
+2. Realtime:
+   - Habilitar Realtime en `messages` y `notifications`.
+3. Storage:
+   - Bucket `product-images` y `avatars` (público lectura, escritura autenticada).
+4. Edge Functions:
+   - Notificar al vendedor cuando se crea un pedido.
+   - Notificar al cliente cuando el vendedor acepta/rechaza.
+5. Índices adicionales si hay mucho tráfico (store_id + status en orders).
+6. Seed de datos de demo opcional (no incluir en producción).
+7. Políticas admin: permitir a role=admin gestionar seller_requests y stores.
+
+## Cómo aplicar cambios futuros
+Usar siempre `apply_migration` (o el SQL Editor) con nombres en snake_case.
+Nunca borrar auth.users ni deshabilitar el proveedor Google sin autorización explícita.
 
 ## Frontend
-DEMO_MODE = false, credenciales de Mi Vitrina
+- DEMO_MODE = false en js/config.js
+- Credenciales apuntan a este proyecto
+- Admin panel solo accesible con guillers240@gmail.com
 
-## Mejoras pendientes
-Ver archivo completo en el repo.
+## Vercel
+- Proyecto destino: mi-vitrina (o mivitrina)
+- Sitio estático (HTML/CSS/JS)

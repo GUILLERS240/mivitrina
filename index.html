@@ -2,12 +2,324 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MercadoPlus - Cargando...</title>
-  <meta http-equiv="refresh" content="0;url=https://github.com/GUILLERS240/mivitrina">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MercadoPlus - Tienda Online</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <p>El sitio completo está en el ZIP y en el repo. Sube todos los archivos del ZIP a este repositorio o despliega el ZIP en Vercel.</p>
-  <p><a href="https://github.com/GUILLERS240/mivitrina">Ver repositorio</a></p>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <button class="menu-btn desktop-only" id="sidebarToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      <a href="#" class="logo" data-view="inicio">
+        <i class="fas fa-store"></i>
+        <span>MercadoPlus</span>
+      </a>
+    </div>
+
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Buscar productos, tiendas...">
+    </div>
+
+    <div class="header-right">
+      <!-- Guest -->
+      <div id="guestActions" class="auth-actions">
+        <button class="btn btn-outline" id="btnLogin">Iniciar sesión</button>
+        <button class="btn btn-primary" id="btnRegister">Registrarse</button>
+      </div>
+
+      <!-- Logged in -->
+      <div id="userActions" class="user-actions hidden">
+        <button class="icon-btn" id="btnMessages" title="Mensajes">
+          <i class="fas fa-comments"></i>
+          <span class="badge" id="msgBadge">0</span>
+        </button>
+        <button class="icon-btn" id="btnNotifications" title="Notificaciones">
+          <i class="fas fa-bell"></i>
+          <span class="badge" id="notifBadge">0</span>
+        </button>
+        <button class="icon-btn" id="btnCart" title="Carrito">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="badge" id="cartBadge">0</span>
+        </button>
+        <div class="user-menu">
+          <button class="avatar-btn" id="avatarBtn">
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=Usuario&background=0D8ABC&color=fff" alt="Avatar">
+          </button>
+          <div class="dropdown hidden" id="userDropdown">
+            <a href="#" data-view="perfil"><i class="fas fa-user"></i> Mi Perfil</a>
+            <a href="#" id="goSellerPanel" class="hidden"><i class="fas fa-store"></i> Panel Vendedor</a>
+            <a href="#" id="goAdminPanel" class="hidden"><i class="fas fa-shield-alt"></i> Panel Admin</a>
+            <hr>
+            <a href="#" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- INICIO - Todos los productos -->
+    <section id="view-inicio" class="view active">
+      <div class="section-header">
+        <h1>Todos los productos</h1>
+        <div class="filters">
+          <select id="categoryFilter">
+            <option value="">Todas las categorías</option>
+            <option value="electronica">Electrónica</option>
+            <option value="ropa">Ropa</option>
+            <option value="hogar">Hogar</option>
+            <option value="deportes">Deportes</option>
+            <option value="belleza">Belleza</option>
+          </select>
+          <select id="sortFilter">
+            <option value="relevancia">Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+            <option value="nuevos">Más nuevos</option>
+          </select>
+        </div>
+      </div>
+      <div class="products-grid" id="productsGrid">
+        <!-- Productos se cargan con JS -->
+      </div>
+    </section>
+
+    <!-- TIENDAS -->
+    <section id="view-tiendas" class="view">
+      <div class="section-header">
+        <h1>Todas las tiendas</h1>
+      </div>
+      <div class="stores-grid" id="storesGrid">
+        <!-- Tiendas se cargan con JS -->
+      </div>
+    </section>
+
+    <!-- PEDIDOS -->
+    <section id="view-pedidos" class="view">
+      <div class="section-header">
+        <h1>Mis Pedidos</h1>
+      </div>
+      <div class="orders-list" id="ordersList">
+        <!-- Pedidos se cargan con JS -->
+      </div>
+      <div class="empty-state hidden" id="ordersEmpty">
+        <i class="fas fa-box-open"></i>
+        <p>Aún no tienes pedidos</p>
+        <button class="btn btn-primary" data-view="inicio">Ir a comprar</button>
+      </div>
+    </section>
+
+    <!-- MI PERFIL -->
+    <section id="view-perfil" class="view">
+      <div class="section-header">
+        <h1>Mi Perfil</h1>
+      </div>
+      <div class="profile-container">
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <img id="profileAvatar" src="https://ui-avatars.com/api/?name=Usuario&background=0D8ABC&color=fff" alt="Avatar">
+            <button class="btn-icon" id="changeAvatar"><i class="fas fa-camera"></i></button>
+          </div>
+          <form id="profileForm">
+            <div class="form-group">
+              <label>Nombre completo</label>
+              <input type="text" id="profName" placeholder="Tu nombre completo" required>
+            </div>
+            <div class="form-group">
+              <label>Correo electrónico</label>
+              <input type="email" id="profEmail" disabled>
+            </div>
+            <div class="form-group">
+              <label>Teléfono</label>
+              <input type="tel" id="profPhone" placeholder="+57 300 000 0000">
+            </div>
+            <div class="form-group">
+              <label>Edad</label>
+              <input type="number" id="profAge" min="13" max="120" placeholder="18">
+            </div>
+            <div class="form-group">
+              <label>Dirección de entrega</label>
+              <textarea id="profAddress" rows="2" placeholder="Calle, número, ciudad, departamento"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Otras especificaciones</label>
+              <textarea id="profNotes" rows="2" placeholder="Referencias, preferencias de entrega..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          </form>
+        </div>
+
+        <div class="profile-card">
+          <h3><i class="fas fa-store"></i> Convertirme en vendedor</h3>
+          <p>Vende tus productos en MercadoPlus. Completa la solicitud y un admin la revisará.</p>
+          <div id="sellerRequestStatus">
+            <button class="btn btn-secondary" id="btnRequestSeller">Solicitar ser vendedor</button>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <h3><i class="fas fa-cog"></i> Configuración de la app</h3>
+          <div class="setting-item">
+            <span>Modo oscuro</span>
+            <label class="switch">
+              <input type="checkbox" id="darkModeToggle">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <span>Notificaciones push</span>
+            <label class="switch">
+              <input type="checkbox" id="pushToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="setting-item">
+            <span>Sonidos</span>
+            <label class="switch">
+              <input type="checkbox" id="soundToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARRITO (overlay/modal) -->
+    <div id="cartPanel" class="side-panel hidden">
+      <div class="side-panel-header">
+        <h2>Carrito de compras</h2>
+        <button class="close-btn" id="closeCart"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="side-panel-body" id="cartItems">
+        <!-- Items del carrito -->
+      </div>
+      <div class="side-panel-footer">
+        <div class="cart-total">
+          <span>Total:</span>
+          <strong id="cartTotal">$0</strong>
+        </div>
+        <button class="btn btn-primary btn-block" id="btnCheckout">Realizar pedido</button>
+      </div>
+    </div>
+
+    <!-- MENSAJES -->
+    <div id="messagesPanel" class="side-panel hidden">
+      <div class="side-panel-header">
+        <h2>Mensajes</h2>
+        <button class="close-btn" id="closeMessages"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="messages-layout">
+        <div class="conversations-list" id="conversationsList"></div>
+        <div class="chat-area hidden" id="chatArea">
+          <div class="chat-header" id="chatHeader"></div>
+          <div class="chat-messages" id="chatMessages"></div>
+          <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Escribe un mensaje...">
+            <button id="sendMsg"><i class="fas fa-paper-plane"></i></button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICACIONES -->
+    <div id="notifPanel" class="side-panel hidden">
+      <div class="side-panel-header">
+        <h2>Notificaciones</h2>
+        <button class="close-btn" id="closeNotif"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="side-panel-body" id="notifList"></div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation (Mobile) -->
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active" data-view="inicio">
+      <i class="fas fa-home"></i>
+      <span>Inicio</span>
+    </a>
+    <a href="#" class="nav-item" data-view="tiendas">
+      <i class="fas fa-store"></i>
+      <span>Tiendas</span>
+    </a>
+    <a href="#" class="nav-item" data-view="pedidos">
+      <i class="fas fa-box"></i>
+      <span>Pedidos</span>
+    </a>
+    <a href="#" class="nav-item" data-view="perfil">
+      <i class="fas fa-user"></i>
+      <span>Mi Perfil</span>
+    </a>
+  </nav>
+
+  <!-- Auth Modal -->
+  <div id="authModal" class="modal hidden">
+    <div class="modal-content">
+      <button class="close-btn" id="closeAuth"><i class="fas fa-times"></i></button>
+      <div class="auth-tabs">
+        <button class="tab active" data-tab="login">Iniciar sesión</button>
+        <button class="tab" data-tab="register">Registrarse</button>
+      </div>
+      <form id="loginForm" class="auth-form">
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="loginEmail" required placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="loginPassword" required placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+      </form>
+      <form id="registerForm" class="auth-form hidden">
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="regName" required placeholder="Tu nombre">
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input type="email" id="regEmail" required placeholder="correo@ejemplo.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres">
+        </div>
+        <div class="form-group">
+          <label>Confirmar contraseña</label>
+          <input type="password" id="regPassword2" required placeholder="Repite la contraseña">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+        <p class="auth-note">Se enviará un correo de verificación a tu email (Supabase).</p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Product Detail Modal -->
+  <div id="productModal" class="modal hidden">
+    <div class="modal-content modal-lg">
+      <button class="close-btn" id="closeProduct"><i class="fas fa-times"></i></button>
+      <div id="productDetail"></div>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div id="toastContainer"></div>
+
+  <!-- Overlay -->
+  <div id="overlay" class="overlay hidden"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
