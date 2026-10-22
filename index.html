@@ -14,6 +14,7 @@
   <link rel="apple-touch-icon" href="icon.svg">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="css/amazon.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -29,9 +30,15 @@
   <div id="appSplash" class="app-splash"><div class="splash-inner"><img class="splash-logo" src="icon.svg" alt="Mi Vitrina"><div class="splash-spinner"></div><div class="splash-text">Mi Vitrina</div></div></div>
   <header class="header">
     <div class="header-left">
-      <a href="#" class="logo" data-view="inicio"><img class="logo-img" src="icon.svg" alt="Mi Vitrina" width="32" height="32"><span>Mi Vitrina</span></a>
+      <a href="#" class="logo" data-view="inicio" aria-label="Mi Vitrina">
+        <img class="logo-img" src="icon.svg" alt="" width="36" height="36">
+        <span class="logo-text">Mi <strong>Vitrina</strong></span>
+      </a>
     </div>
-    <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="searchInput" placeholder="Buscar productos, tiendas..." autocomplete="off"></div>
+    <div class="search-bar">
+      <i class="fas fa-search" aria-hidden="true"></i>
+      <input type="text" id="searchInput" placeholder="Buscar en Mi Vitrina" autocomplete="off">
+    </div>
     <div class="header-right">
       <div id="guestActions" class="auth-actions">
         <button class="btn btn-outline" id="btnLogin">Iniciar sesión</button>
@@ -55,10 +62,25 @@
   </header>
   <main class="main-content">
     <section id="view-inicio" class="view active">
-      <div class="section-header"><h1>Todos los productos</h1>
-        <div class="filters">
-          <select id="categoryFilter"><option value="">Todas las categorías</option><option value="electronica">Electrónica</option><option value="ropa">Ropa</option><option value="hogar">Hogar</option><option value="deportes">Deportes</option><option value="belleza">Belleza</option></select>
-          <select id="sortFilter"><option value="relevancia">Relevancia</option><option value="precio-asc">Precio: menor a mayor</option><option value="precio-desc">Precio: mayor a menor</option><option value="nuevos">Más nuevos</option></select>
+      <div class="section-header">
+        <h1>Todos los productos</h1>
+        <div class="filters filter-chips">
+          <button type="button" class="chip-btn" id="btnOpenCategory"><i class="fas fa-th-large"></i> <span id="categoryLabel">Categoría</span></button>
+          <button type="button" class="chip-btn" id="btnOpenSort"><i class="fas fa-sort"></i> <span id="sortLabel">Ordenar</span></button>
+          <select id="categoryFilter" class="hidden" aria-hidden="true">
+            <option value="">Todas</option>
+            <option value="electronica">Electrónica</option>
+            <option value="ropa">Ropa</option>
+            <option value="hogar">Hogar</option>
+            <option value="deportes">Deportes</option>
+            <option value="belleza">Belleza</option>
+          </select>
+          <select id="sortFilter" class="hidden" aria-hidden="true">
+            <option value="relevancia">Relevancia</option>
+            <option value="precio-asc">Precio: menor a mayor</option>
+            <option value="precio-desc">Precio: mayor a menor</option>
+            <option value="nuevos">Más nuevos</option>
+          </select>
         </div>
       </div>
       <div class="products-grid" id="productsGrid"></div>
@@ -130,7 +152,27 @@
     <form id="loginForm" class="auth-form"><div class="form-group"><label>Correo electrónico</label><input type="email" id="loginEmail" required placeholder="correo@ejemplo.com" autocomplete="email"></div><div class="form-group"><label>Contraseña</label><input type="password" id="loginPassword" required placeholder="••••••••" autocomplete="current-password"></div><button type="submit" class="btn btn-primary btn-block">Entrar</button><div class="auth-divider">o continúa con</div><button type="button" class="btn-google" id="btnGoogleLogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button></form>
     <form id="registerForm" class="auth-form hidden"><div class="form-group"><label>Nombre completo</label><input type="text" id="regName" required placeholder="Tu nombre" autocomplete="name"></div><div class="form-group"><label>Correo electrónico</label><input type="email" id="regEmail" required placeholder="correo@ejemplo.com" autocomplete="email"></div><div class="form-group"><label>Contraseña</label><input type="password" id="regPassword" required minlength="6" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div><div class="form-group"><label>Confirmar contraseña</label><input type="password" id="regPassword2" required placeholder="Repite la contraseña" autocomplete="new-password"></div><button type="submit" class="btn btn-primary btn-block">Crear cuenta</button><div class="auth-divider">o regístrate con</div><button type="button" class="btn-google" id="btnGoogleRegister"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google"> Continuar con Google</button><p class="auth-note">Al registrarte aceptas los términos de uso.</p></form>
   </div></div>
-  <div id="productModal" class="modal hidden"><div class="modal-content modal-lg"><button class="close-btn" id="closeProduct"><i class="fas fa-times"></i></button><div id="productDetail"></div></div></div>
+  <div id="sheetCategory" class="bottom-sheet hidden"><div class="sheet-handle"></div><h3>Categoría</h3><div class="sheet-options" id="categoryOptions">
+    <button type="button" data-value="" class="sheet-opt active">Todas las categorías</button>
+    <button type="button" data-value="electronica" class="sheet-opt">Electrónica</button>
+    <button type="button" data-value="ropa" class="sheet-opt">Ropa</button>
+    <button type="button" data-value="hogar" class="sheet-opt">Hogar</button>
+    <button type="button" data-value="deportes" class="sheet-opt">Deportes</button>
+    <button type="button" data-value="belleza" class="sheet-opt">Belleza</button>
+  </div></div>
+  <div id="sheetSort" class="bottom-sheet hidden"><div class="sheet-handle"></div><h3>Ordenar por</h3><div class="sheet-options" id="sortOptions">
+    <button type="button" data-value="relevancia" class="sheet-opt active">Relevancia</button>
+    <button type="button" data-value="precio-asc" class="sheet-opt">Precio: menor a mayor</button>
+    <button type="button" data-value="precio-desc" class="sheet-opt">Precio: mayor a menor</button>
+    <button type="button" data-value="nuevos" class="sheet-opt">Más nuevos</button>
+  </div></div>
+  <div id="productModal" class="modal hidden">
+    <div class="modal-content modal-product">
+      <button class="close-btn" id="closeProduct" aria-label="Cerrar"><i class="fas fa-times"></i></button>
+      <div id="productDetail" class="product-detail-sheet"></div>
+    </div>
+  </div>
+  <div id="authModal" class="modal hidden" style="display:none"></div>
   <div id="toastContainer"></div><div id="overlay" class="overlay hidden"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script><script src="js/data.js"></script><script src="js/supabase-client.js"></script><script src="js/auth.js"></script><script src="js/app.js"></script>
