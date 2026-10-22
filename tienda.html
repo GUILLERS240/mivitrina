@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Tienda - Mi Vitrina</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/mobile.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .store-hero { position: relative; height: 180px; background: linear-gradient(135deg, #146eb4, #0a4a7a); overflow: hidden; }
+    .store-hero img.banner { width: 100%; height: 100%; object-fit: cover; }
+    .store-hero-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 40%, rgba(0,0,0,0.7)); }
+    .store-info-bar { display: flex; align-items: flex-end; gap: 16px; padding: 0 20px 16px; margin-top: -48px; position: relative; z-index: 2; }
+    .store-logo { width: 80px; height: 80px; border-radius: 16px; border: 3px solid var(--bg-card); object-fit: cover; background: var(--bg-card); box-shadow: var(--shadow); }
+    .store-meta h1 { font-size: 1.4rem; margin: 0 0 4px; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+    .store-meta p { color: rgba(255,255,255,0.85); font-size: 0.9rem; margin: 0; }
+    .store-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 12px 20px; }
+    .pay-box { background: var(--bg-card); border-radius: 12px; padding: 16px; margin: 12px 20px; box-shadow: var(--shadow); }
+    .pay-box h3 { margin: 0 0 8px; font-size: 1rem; }
+    .pay-qr { max-width: 180px; border-radius: 8px; display: block; margin: 8px auto; }
+    .products-section { padding: 16px 20px 80px; }
+    .products-section h2 { font-size: 1.1rem; margin-bottom: 12px; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; color: var(--text); text-decoration: none; font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Volver a Mi Vitrina</a>
+
+  <div id="storeLoading" style="text-align:center;padding:60px 20px;color:var(--text-muted)">
+    <i class="fas fa-spinner fa-spin" style="font-size:2rem"></i>
+    <p>Cargando tienda...</p>
+  </div>
+
+  <div id="storeContent" class="hidden">
+    <div class="store-hero">
+      <img id="storeBanner" class="banner" src="" alt="" style="display:none">
+      <div class="store-hero-overlay"></div>
+    </div>
+    <div class="store-info-bar">
+      <img id="storeLogo" class="store-logo" src="" alt="Logo">
+      <div class="store-meta">
+        <h1 id="storeName">—</h1>
+        <p id="storeDesc"></p>
+      </div>
+    </div>
+    <div class="store-actions">
+      <button class="btn btn-outline btn-sm" id="btnShare"><i class="fas fa-share-alt"></i> Compartir</button>
+      <button class="btn btn-outline btn-sm" id="btnCopyLink"><i class="fas fa-link"></i> Copiar enlace</button>
+    </div>
+    <div id="payBox" class="pay-box hidden">
+      <h3><i class="fas fa-money-bill-wave"></i> Pago por transferencia</h3>
+      <p id="payMethod" style="font-size:0.9rem;color:var(--text-muted);margin:0 0 8px"></p>
+      <img id="payQr" class="pay-qr" src="" alt="QR de pago" style="display:none">
+      <p id="payPhone" style="text-align:center;font-size:0.9rem;margin:4px 0"></p>
+    </div>
+    <div class="products-section">
+      <h2>Productos</h2>
+      <div class="products-grid" id="storeProducts"></div>
+    </div>
+  </div>
+
+  <div id="storeNotFound" class="hidden" style="text-align:center;padding:80px 20px">
+    <i class="fas fa-store-slash" style="font-size:3rem;color:var(--text-muted)"></i>
+    <h2>Tienda no encontrada</h2>
+    <p style="color:var(--text-muted)">El enlace puede ser incorrecto o la tienda ya no está activa.</p>
+    <a href="index.html" class="btn btn-primary" style="margin-top:16px">Ir al inicio</a>
+  </div>
+
+  <div id="toastContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/supabase-client.js"></script>
+  <script>
+    function toast(msg, type='') {
+      const c = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.textContent = msg;
+      c.appendChild(el);
+      setTimeout(() => el.remove(), 3000);
+    }
+    function formatPrice(n) {
+      return (window.CONFIG?.CURRENCY_SYMBOL || '$') + Number(n).toLocaleString('es-CO');
+    }
+    function getSlug() {
+      const path = location.pathname;
+      const m = path.match(/\/tienda\/([^/?#]+)/);
+      if (m) return decodeURIComponent(m[1]);
+      return new URLSearchParams(location.search).get('slug') || '';
+    }
+    async function loadStore() {
+      const slug = getSlug();
+      if (!slug) {
+        document.getElementById('storeLoading').classList.add('hidden');
+        document.getElementById('storeNotFound').classList.remove('hidden');
+        return;
+      }
+      try {
+        let store = null;
+        if (window.sb) {
+          const { data, error } = await sb.from('stores').select('*').eq('slug', slug).eq('active', true).maybeSingle();
+          if (error) throw error;
+          store = data;
+        }
+        if (!store) {
+          document.getElementById('storeLoading').classList.add('hidden');
+          document.getElementById('storeNotFound').classList.remove('hidden');
+          return;
+        }
+        document.getElementById('storeLoading').classList.add('hidden');
+        document.getElementById('storeContent').classList.remove('hidden');
+        document.getElementById('storeName').textContent = store.name;
+        document.getElementById('storeDesc').textContent = store.description || store.category || '';
+        document.title = store.name + ' - Mi Vitrina';
+        const logo = store.logo || `https://ui-avatars.com/api/?name=${encodeURIComponent(store.name)}&background=146eb4&color=fff&size=160`;
+        document.getElementById('storeLogo').src = logo;
+        if (store.banner) {
+          const b = document.getElementById('storeBanner');
+          b.src = store.banner;
+          b.style.display = 'block';
+        }
+        if (store.payment_method || store.payment_qr_url) {
+          document.getElementById('payBox').classList.remove('hidden');
+          const labels = { enzona: 'Enzona', transfermovil: 'Transfermóvil', ambos: 'Enzona / Transfermóvil' };
+          document.getElementById('payMethod').textContent = 'Método: ' + (labels[store.payment_method] || store.payment_method || 'Transferencia');
+          if (store.payment_qr_url) {
+            const qr = document.getElementById('payQr');
+            qr.src = store.payment_qr_url;
+            qr.style.display = 'block';
+          }
+          if (store.payment_phone) document.getElementById('payPhone').textContent = 'Tel: ' + store.payment_phone;
+        }
+        const shareUrl = location.origin + '/tienda/' + store.slug;
+        document.getElementById('btnShare').onclick = async () => {
+          if (navigator.share) {
+            try { await navigator.share({ title: store.name, url: shareUrl }); } catch (_) {}
+          } else {
+            await navigator.clipboard.writeText(shareUrl);
+            toast('Enlace copiado', 'success');
+          }
+        };
+        document.getElementById('btnCopyLink').onclick = async () => {
+          await navigator.clipboard.writeText(shareUrl);
+          toast('Enlace copiado', 'success');
+        };
+        let products = [];
+        if (window.sb) {
+          const { data } = await sb.from('products').select('*').eq('store_id', store.id).eq('active', true).order('created_at', { ascending: false });
+          products = data || [];
+        }
+        const grid = document.getElementById('storeProducts');
+        if (!products.length) {
+          grid.innerHTML = '<p style="color:var(--text-muted);grid-column:1/-1;text-align:center">Esta tienda aún no tiene productos.</p>';
+        } else {
+          grid.innerHTML = products.map(p => {
+            const disc = p.old_price && p.old_price > p.price ? Math.round((1 - p.price / p.old_price) * 100) : 0;
+            return `<div class="product-card"><div class="img-wrap">${disc ? `<span class="badge-discount">-${disc}%</span>` : ''}<img src="${p.image || 'https://via.placeholder.com/400?text=Producto'}" alt="${p.name}" loading="lazy"></div><div class="info"><div class="title">${p.name}</div><div class="price">${formatPrice(p.price)}${p.old_price ? `<small>${formatPrice(p.old_price)}</small>` : ''}</div></div></div>`;
+          }).join('');
+        }
+      } catch (e) {
+        console.error(e);
+        document.getElementById('storeLoading').classList.add('hidden');
+        document.getElementById('storeNotFound').classList.remove('hidden');
+      }
+    }
+    document.addEventListener('DOMContentLoaded', loadStore);
+  </script>
+</body>
+</html>
