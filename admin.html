@@ -3,89 +3,32 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin - MercadoPlus</title>
+  <title>Panel Admin - Mi Vitrina</title>
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     .admin-layout { display: flex; min-height: 100vh; }
-    .admin-sidebar {
-      width: 240px;
-      background: #1a1a2e;
-      color: #fff;
-      padding: 20px 0;
-      flex-shrink: 0;
-    }
-    .admin-sidebar .logo {
-      padding: 0 20px 24px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .admin-sidebar { width: 240px; background: #1a1a2e; color: #fff; padding: 20px 0; flex-shrink: 0; }
+    .admin-sidebar .logo { padding: 0 20px 24px; font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
     .admin-sidebar .logo i { color: #e94560; }
-    .admin-nav a {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: rgba(255,255,255,0.7);
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
-    .admin-nav a:hover, .admin-nav a.active {
-      background: rgba(255,255,255,0.1);
-      color: #fff;
-    }
+    .admin-nav a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: rgba(255,255,255,0.7); font-size: 0.9rem; transition: all 0.2s; text-decoration: none; cursor: pointer; }
+    .admin-nav a:hover, .admin-nav a.active { background: rgba(255,255,255,0.1); color: #fff; }
     .admin-nav a.active { border-left: 3px solid #e94560; }
     .admin-main { flex: 1; background: var(--bg); overflow-y: auto; }
-    .admin-header {
-      background: var(--bg-card);
-      padding: 16px 24px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .admin-header { background: var(--bg-card); padding: 16px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
     .admin-content { padding: 24px; }
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .stat-card {
-      background: var(--bg-card);
-      border-radius: 8px;
-      padding: 20px;
-      box-shadow: var(--shadow);
-    }
-    .stat-card .stat-value { font-size: 1.8rem; font-weight: 700; margin: 4px 0; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-card { background: var(--bg-card); border-radius: 8px; padding: 20px; box-shadow: var(--shadow); }
+    .stat-card .stat-value { font-size: 1.6rem; font-weight: 700; margin: 4px 0; }
     .stat-card .stat-label { font-size: 0.85rem; color: var(--text-muted); }
     .admin-section { display: none; }
     .admin-section.active { display: block; }
     .table-wrap { overflow-x: auto; }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: var(--bg-card);
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    th, td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); }
-    th { background: var(--bg); font-weight: 600; font-size: 0.85rem; color: var(--text-muted); }
-    td { font-size: 0.9rem; }
-    .access-denied {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      text-align: center;
-      padding: 24px;
-    }
+    table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.88rem; }
+    th { background: var(--bg); font-weight: 600; color: var(--text-muted); }
+    .access-denied { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; text-align: center; padding: 24px; }
     .access-denied i { font-size: 4rem; color: var(--danger); margin-bottom: 16px; }
     @media (max-width: 768px) {
       .admin-layout { flex-direction: column; }
@@ -99,8 +42,9 @@
   <div id="accessDenied" class="access-denied hidden">
     <i class="fas fa-shield-alt"></i>
     <h1>Acceso denegado</h1>
-    <p>Solo el administrador autorizado puede acceder a este panel.</p>
-    <p style="color:var(--text-muted);margin:8px 0 20px">Correo autorizado: guillers240@gmail.com</p>
+    <p>Solo el administrador autorizado puede acceder.</p>
+    <p style="color:var(--text-muted);margin:8px 0 20px">guillers240@gmail.com</p>
+    <button class="btn btn-outline" onclick="if(history.length>1)history.back();else location.href='index.html'" style="margin-bottom:8px"><i class="fas fa-arrow-left"></i> Atrás</button>
     <a href="index.html" class="btn btn-primary">Volver a la tienda</a>
   </div>
 
@@ -108,134 +52,59 @@
     <aside class="admin-sidebar">
       <div class="logo"><i class="fas fa-shield-alt"></i> Admin Panel</div>
       <nav class="admin-nav">
-        <a href="#" class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
-        <a href="#" data-section="users"><i class="fas fa-users"></i> Usuarios</a>
-        <a href="#" data-section="sellers"><i class="fas fa-store"></i> Solicitudes Vendedor</a>
-        <a href="#" data-section="stores"><i class="fas fa-shop"></i> Tiendas</a>
-        <a href="#" data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
-        <a href="#" data-section="settings"><i class="fas fa-cog"></i> Configuración</a>
+        <a class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+        <a data-section="users"><i class="fas fa-users"></i> Usuarios</a>
+        <a data-section="sellers"><i class="fas fa-store"></i> Solicitudes Vendedor</a>
+        <a data-section="managers"><i class="fas fa-handshake"></i> Gestores</a>
+        <a data-section="stores"><i class="fas fa-shop"></i> Tiendas</a>
+        <a data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
         <a href="index.html"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
       </nav>
     </aside>
-
     <div class="admin-main">
       <div class="admin-header">
         <h2 id="sectionTitle">Dashboard</h2>
-        <div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
           <span style="color:var(--text-muted);font-size:0.85rem">Admin:</span>
           <strong id="adminEmail"></strong>
+          <button type="button" class="btn btn-sm btn-outline" onclick="if(history.length>1)history.back();else location.href='index.html'" style="border-color:var(--border);color:var(--text)"><i class="fas fa-arrow-left"></i> Atrás</button>
+          <a href="index.html" class="btn btn-sm btn-outline">Inicio</a>
         </div>
       </div>
-
       <div class="admin-content">
-        <!-- Dashboard -->
         <section id="sec-dashboard" class="admin-section active">
           <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-label">Usuarios registrados</div>
-              <div class="stat-value" id="statUsers">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Tiendas activas</div>
-              <div class="stat-value" id="statStores">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Productos</div>
-              <div class="stat-value" id="statProducts">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Pedidos totales</div>
-              <div class="stat-value" id="statOrders">0</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-label">Solicitudes pendientes</div>
-              <div class="stat-value" id="statRequests">0</div>
-            </div>
+            <div class="stat-card"><div class="stat-label">Usuarios</div><div class="stat-value" id="statUsers">0</div></div>
+            <div class="stat-card"><div class="stat-label">Tiendas</div><div class="stat-value" id="statStores">0</div></div>
+            <div class="stat-card"><div class="stat-label">Productos</div><div class="stat-value" id="statProducts">0</div></div>
+            <div class="stat-card"><div class="stat-label">Pedidos</div><div class="stat-value" id="statOrders">0</div></div>
+            <div class="stat-card"><div class="stat-label">Solicitudes vendedor</div><div class="stat-value" id="statRequests">0</div></div>
           </div>
         </section>
-
-        <!-- Usuarios -->
         <section id="sec-users" class="admin-section">
-          <h3 style="margin-bottom:16px">Usuarios registrados</h3>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Teléfono</th><th>Acciones</th></tr>
-              </thead>
-              <tbody id="usersBody"></tbody>
-            </table>
-          </div>
+          <h3 style="margin-bottom:16px">Usuarios</h3>
+          <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Teléfono</th><th>Edad</th></tr></thead><tbody id="usersBody"></tbody></table></div>
         </section>
-
-        <!-- Solicitudes vendedor -->
         <section id="sec-sellers" class="admin-section">
-          <h3 style="margin-bottom:16px">Solicitudes para ser vendedor</h3>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Usuario</th><th>Nombre tienda</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr>
-              </thead>
-              <tbody id="requestsBody">
-                <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay solicitudes</td></tr>
-              </tbody>
-            </table>
-          </div>
+          <h3 style="margin-bottom:16px">Solicitudes de vendedor</h3>
+          <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Tienda</th><th>Categoría</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="requestsBody"></tbody></table></div>
         </section>
-
-        <!-- Tiendas -->
+        <section id="sec-managers" class="admin-section">
+          <h3 style="margin-bottom:16px">Solicitudes de gestor</h3>
+          <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="managersBody"></tbody></table></div>
+        </section>
         <section id="sec-stores" class="admin-section">
-          <h3 style="margin-bottom:16px">Todas las tiendas</h3>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>Nombre</th><th>Descripción</th><th>Productos</th><th>Rating</th><th>Estado</th></tr>
-              </thead>
-              <tbody id="storesBody"></tbody>
-            </table>
-          </div>
+          <h3 style="margin-bottom:16px">Tiendas</h3>
+          <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Slug</th><th>Categoría</th><th>Estado</th></tr></thead><tbody id="storesBody"></tbody></table></div>
         </section>
-
-        <!-- Pedidos -->
         <section id="sec-orders" class="admin-section">
-          <h3 style="margin-bottom:16px">Todos los pedidos</h3>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr><th>ID</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Items</th></tr>
-              </thead>
-              <tbody id="ordersBody"></tbody>
-            </table>
-          </div>
-        </section>
-
-        <!-- Settings -->
-        <section id="sec-settings" class="admin-section">
-          <h3 style="margin-bottom:16px">Configuración general</h3>
-          <div class="product-form" style="background:var(--bg-card);padding:24px;border-radius:8px;box-shadow:var(--shadow);max-width:500px">
-            <div class="form-group">
-              <label>Nombre del sitio</label>
-              <input type="text" value="MercadoPlus" id="siteName">
-            </div>
-            <div class="form-group">
-              <label>Correo de soporte</label>
-              <input type="email" value="soporte@mercadoplus.com" id="supportEmail">
-            </div>
-            <div class="form-group">
-              <label>Modo mantenimiento</label>
-              <label class="switch">
-                <input type="checkbox" id="maintenanceMode">
-                <span class="slider"></span>
-              </label>
-            </div>
-            <button class="btn btn-primary" onclick="toast('Configuración guardada (demo)','success')">Guardar</button>
-          </div>
+          <h3 style="margin-bottom:16px">Pedidos</h3>
+          <div class="table-wrap"><table><thead><tr><th>ID</th><th>Total</th><th>Estado</th><th>Pago</th><th>Fecha</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
         </section>
       </div>
     </div>
   </div>
-
   <div id="toastContainer"></div>
-
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="js/config.js"></script>
   <script src="js/data.js"></script>
@@ -250,24 +119,17 @@
       c.appendChild(el);
       setTimeout(() => el.remove(), 3000);
     }
-
-    function formatPrice(n) {
-      return '$' + Number(n).toLocaleString('es-CO');
-    }
+    function formatPrice(n) { return '$' + Number(n||0).toLocaleString('es-CO'); }
 
     async function init() {
       await Auth.init();
-
-      // SOLO el correo admin tiene acceso
       if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
         document.getElementById('accessDenied').classList.remove('hidden');
         return;
       }
-
       document.getElementById('adminApp').classList.remove('hidden');
       document.getElementById('adminEmail').textContent = Auth.getUser().email;
 
-      // Navegación
       document.querySelectorAll('.admin-nav a[data-section]').forEach(a => {
         a.addEventListener('click', (e) => {
           e.preventDefault();
@@ -278,142 +140,128 @@
           document.getElementById('sectionTitle').textContent = a.textContent.trim();
           if (a.dataset.section === 'users') renderUsers();
           if (a.dataset.section === 'sellers') renderRequests();
+          if (a.dataset.section === 'managers') renderManagers();
           if (a.dataset.section === 'stores') renderStores();
           if (a.dataset.section === 'orders') renderOrders();
         });
       });
-
       renderDashboard();
     }
 
-    function renderDashboard() {
-      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
-      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
-      const req = localStorage.getItem('mp_seller_request');
-
-      document.getElementById('statUsers').textContent = users.length;
-      document.getElementById('statStores').textContent = MOCK_STORES.length;
-      document.getElementById('statProducts').textContent = MOCK_PRODUCTS.length;
-      document.getElementById('statOrders').textContent = orders.length;
-      document.getElementById('statRequests').textContent = req ? 1 : 0;
+    async function renderDashboard() {
+      if (!window.sb) return;
+      const [users, stores, products, orders, reqs] = await Promise.all([
+        sb.from('profiles').select('id', { count: 'exact', head: true }),
+        sb.from('stores').select('id', { count: 'exact', head: true }),
+        sb.from('products').select('id', { count: 'exact', head: true }),
+        sb.from('orders').select('id', { count: 'exact', head: true }),
+        sb.from('seller_requests').select('id', { count: 'exact', head: true }).eq('status', 'pendiente'),
+      ]);
+      document.getElementById('statUsers').textContent = users.count ?? 0;
+      document.getElementById('statStores').textContent = stores.count ?? 0;
+      document.getElementById('statProducts').textContent = products.count ?? 0;
+      document.getElementById('statOrders').textContent = orders.count ?? 0;
+      document.getElementById('statRequests').textContent = reqs.count ?? 0;
     }
 
-    function renderUsers() {
-      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
+    async function renderUsers() {
+      const { data } = await sb.from('profiles').select('*').order('created_at', { ascending: false });
       const tbody = document.getElementById('usersBody');
-      if (users.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay usuarios</td></tr>';
-        return;
-      }
-      tbody.innerHTML = users.map(u => `
-        <tr>
-          <td>${u.name}</td>
-          <td>${u.email}</td>
-          <td><span class="status-badge ${u.role === 'admin' ? 'status-aceptado' : u.role === 'seller' ? 'status-enviado' : 'status-pendiente'}">${u.role}</span></td>
-          <td>${u.phone || '—'}</td>
-          <td>
-            ${u.role !== 'admin' ? `<button class="btn btn-sm btn-secondary" onclick="makeSeller('${u.id}')">Hacer vendedor</button>` : '—'}
-          </td>
-        </tr>
-      `).join('');
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin usuarios</td></tr>'; return; }
+      tbody.innerHTML = data.map(u => `<tr>
+        <td>${u.full_name||'—'}</td><td>${u.email||'—'}</td>
+        <td><span class="status-badge">${u.role}</span></td>
+        <td>${u.phone||'—'}</td><td>${u.age??'—'}</td>
+      </tr>`).join('');
     }
 
-    function renderRequests() {
-      const req = localStorage.getItem('mp_seller_request');
+    async function renderRequests() {
+      const { data } = await sb.from('seller_requests').select('*, profiles(full_name, email, phone, age)').order('created_at', { ascending: false });
       const tbody = document.getElementById('requestsBody');
-      if (!req) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay solicitudes</td></tr>';
-        return;
-      }
-      const r = JSON.parse(req);
-      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
-      const user = users.find(u => u.id === r.user_id) || { name: 'Usuario', email: '—' };
-      tbody.innerHTML = `
-        <tr>
-          <td>${user.name} (${user.email || r.user_id})</td>
-          <td>${r.store_name || '—'}</td>
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Sin solicitudes</td></tr>'; return; }
+      tbody.innerHTML = data.map(r => {
+        const u = r.profiles || {};
+        return `<tr>
+          <td>${u.full_name||'—'}<br><small>${u.email||''}</small><br><small>Edad: ${u.age??'—'} · Tel: ${u.phone||r.phone||'—'}</small></td>
+          <td>${r.store_name||'—'}<br><small>${r.description||''}</small></td>
+          <td>${r.category||'—'}</td>
           <td>${new Date(r.created_at).toLocaleDateString('es-CO')}</td>
           <td><span class="status-badge status-${r.status}">${r.status}</span></td>
-          <td>
-            ${r.status === 'pendiente' ? `
-              <button class="btn btn-sm btn-primary" onclick="approveSeller()">Aprobar</button>
-              <button class="btn btn-sm btn-danger" onclick="rejectSeller()">Rechazar</button>
-            ` : r.status}
+          <td>${r.status==='pendiente'?`
+            <button class="btn btn-sm btn-primary" onclick="approveSeller('${r.id}','${r.user_id}','${(r.store_name||'').replace(/'/g,'')}')">Aprobar</button>
+            <button class="btn btn-sm btn-danger" onclick="rejectSeller('${r.id}')">Rechazar</button>`:r.status}
           </td>
-        </tr>
-      `;
+        </tr>`;
+      }).join('');
     }
 
-    function renderStores() {
+    async function renderManagers() {
+      const { data } = await sb.from('manager_requests').select('*, profiles(full_name, email)').order('created_at', { ascending: false });
+      const tbody = document.getElementById('managersBody');
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Sin solicitudes</td></tr>'; return; }
+      tbody.innerHTML = data.map(r => `<tr>
+        <td>${r.profiles?.full_name||'—'} (${r.profiles?.email||''})</td>
+        <td>${new Date(r.created_at).toLocaleDateString('es-CO')}</td>
+        <td>${r.status}</td>
+        <td>${r.status==='pendiente'?`
+          <button class="btn btn-sm btn-primary" onclick="approveManager('${r.id}','${r.user_id}')">Aprobar</button>
+          <button class="btn btn-sm btn-danger" onclick="rejectManager('${r.id}')">Rechazar</button>`:r.status}
+        </td>
+      </tr>`).join('');
+    }
+
+    async function renderStores() {
+      const { data } = await sb.from('stores').select('*').order('created_at', { ascending: false });
       const tbody = document.getElementById('storesBody');
-      tbody.innerHTML = MOCK_STORES.map(s => `
-        <tr>
-          <td>${s.name}</td>
-          <td>${s.description}</td>
-          <td>${s.products_count}</td>
-          <td>${s.rating} ★</td>
-          <td><span class="status-badge status-aceptado">Activa</span></td>
-        </tr>
-      `).join('');
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Sin tiendas</td></tr>'; return; }
+      tbody.innerHTML = data.map(s => `<tr>
+        <td>${s.name}</td><td>${s.slug||'—'}</td><td>${s.category||'—'}</td>
+        <td>${s.active?'Activa':'Inactiva'}</td>
+      </tr>`).join('');
     }
 
-    function renderOrders() {
-      const orders = JSON.parse(localStorage.getItem('mp_orders') || '[]');
+    async function renderOrders() {
+      const { data } = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(100);
       const tbody = document.getElementById('ordersBody');
-      if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>';
-        return;
-      }
-      tbody.innerHTML = orders.map(o => `
-        <tr>
-          <td>#${o.id.slice(-8)}</td>
-          <td>${formatPrice(o.total)}</td>
-          <td><span class="status-badge status-${o.status}">${o.status}</span></td>
-          <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
-          <td>${(o.items || []).length}</td>
-        </tr>
-      `).join('');
+      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr>'; return; }
+      tbody.innerHTML = data.map(o => `<tr>
+        <td>#${String(o.id).slice(-8)}</td>
+        <td>${formatPrice(o.total)}</td>
+        <td><span class="status-badge status-${o.status}">${o.status}</span></td>
+        <td>${o.payment_status||'—'}</td>
+        <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td>
+      </tr>`).join('');
     }
 
-    function approveSeller() {
-      const req = JSON.parse(localStorage.getItem('mp_seller_request'));
-      req.status = 'aprobado';
-      localStorage.setItem('mp_seller_request', JSON.stringify(req));
-      // Actualizar rol del usuario
-      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
-      const u = users.find(x => x.id === req.user_id);
-      if (u) {
-        u.role = 'seller';
-        localStorage.setItem('mp_users', JSON.stringify(users));
-      }
-      // Si es el usuario actual
-      if (Auth.currentUser && Auth.currentUser.id === req.user_id) {
-        Auth.currentUser.role = 'seller';
-        localStorage.setItem('mp_user', JSON.stringify(Auth.currentUser));
+    window.approveSeller = async function(reqId, userId, storeName) {
+      await sb.from('seller_requests').update({ status: 'aprobado', reviewed_at: new Date().toISOString(), reviewed_by: Auth.getUser().id }).eq('id', reqId);
+      await sb.from('profiles').update({ role: 'seller' }).eq('id', userId);
+      // Crear tienda si no existe
+      const { data: existing } = await sb.from('stores').select('id').eq('owner_id', userId).maybeSingle();
+      if (!existing) {
+        const slug = (storeName||'tienda').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) + '-' + Date.now().toString(36).slice(-4);
+        await sb.from('stores').insert({ owner_id: userId, name: storeName || 'Mi Tienda', slug, active: true });
       }
       toast('Vendedor aprobado', 'success');
       renderRequests();
       renderDashboard();
-    }
-
-    function rejectSeller() {
-      const req = JSON.parse(localStorage.getItem('mp_seller_request'));
-      req.status = 'rechazado';
-      localStorage.setItem('mp_seller_request', JSON.stringify(req));
-      toast('Solicitud rechazada');
+    };
+    window.rejectSeller = async function(reqId) {
+      await sb.from('seller_requests').update({ status: 'rechazado', reviewed_at: new Date().toISOString(), reviewed_by: Auth.getUser().id }).eq('id', reqId);
+      toast('Rechazado');
       renderRequests();
-    }
-
-    function makeSeller(userId) {
-      const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
-      const u = users.find(x => x.id === userId);
-      if (u) {
-        u.role = 'seller';
-        localStorage.setItem('mp_users', JSON.stringify(users));
-        toast(`${u.name} ahora es vendedor`, 'success');
-        renderUsers();
-      }
-    }
+    };
+    window.approveManager = async function(reqId, userId) {
+      await sb.from('manager_requests').update({ status: 'aprobado', reviewed_at: new Date().toISOString(), reviewed_by: Auth.getUser().id }).eq('id', reqId);
+      await sb.from('profiles').update({ role: 'manager', is_manager: true }).eq('id', userId);
+      toast('Gestor aprobado', 'success');
+      renderManagers();
+    };
+    window.rejectManager = async function(reqId) {
+      await sb.from('manager_requests').update({ status: 'rechazado', reviewed_at: new Date().toISOString() }).eq('id', reqId);
+      toast('Rechazado');
+      renderManagers();
+    };
 
     document.addEventListener('DOMContentLoaded', init);
   </script>
