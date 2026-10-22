@@ -1,5 +1,5 @@
 /**
- * Mi Vitrina v0.1.1 - Logica principal
+ * Mi Vitrina v0.1.2 - Logica principal
  */
 const State = {
   cart: JSON.parse(localStorage.getItem('mp_cart') || '[]'),
@@ -52,6 +52,10 @@ function updateMsgBadge() {
 }
 
 function switchView(viewName) {
+  if ((viewName === 'perfil' || viewName === 'pedidos') && typeof Auth !== 'undefined' && !Auth.isLoggedIn()) {
+    openAuthModal('login');
+    return;
+  }
   State.currentView = viewName;
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const target = document.getElementById(`view-${viewName}`);
@@ -322,7 +326,6 @@ async function renderOrders() {
 
 function renderProfile() {
   if (!Auth.isLoggedIn()) {
-    switchView('inicio');
     openAuthModal('login');
     return;
   }
@@ -341,8 +344,7 @@ function renderProfile() {
 async function updateSellerRequestUI() {
   const container = document.getElementById('sellerRequestStatus');
   if (Auth.isSeller()) {
-    container.innerHTML = `
-      <p style="color:var(--success);font-weight:600"><i class="fas fa-check-circle"></i> Ya eres vendedor</p>
+    container.innerHTML = `<p style="color:var(--success);font-weight:600"><i class="fas fa-check-circle"></i> Ya eres vendedor</p>
       <a href="seller.html" class="btn btn-secondary" style="margin-top:8px;display:inline-flex">Ir al Panel Vendedor</a>`;
     return;
   }
