@@ -13,6 +13,17 @@ const Auth = {
       return this.currentUser;
     }
     try {
+      const hash = window.location.hash || '';
+      if (hash.includes('access_token') || hash.includes('type=signup') || hash.includes('type=email')) {
+        const { data: { session: hashSession }, error: hashErr } = await sb.auth.getSession();
+        if (hashErr) console.warn('[Auth.hash]', hashErr);
+        if (hashSession?.user) {
+          this.currentUser = await this._mapUser(hashSession.user);
+          try {
+            history.replaceState(null, '', window.location.pathname + window.location.search);
+          } catch (_) {}
+        }
+      }
       const { data: { session } } = await sb.auth.getSession();
       if (session?.user) {
         this.currentUser = await this._mapUser(session.user);
@@ -113,7 +124,7 @@ const Auth = {
       password,
       options: {
         data: { full_name: fullName },
-        emailRedirectTo: window.location.origin + '/',
+        emailRedirectTo: (window.location.origin || '').replace(/\/$/, '') + '/',
       },
     });
     if (error) {
@@ -140,14 +151,28 @@ const Auth = {
         this.currentUser = await this._mapUser(data.user);
         return this.currentUser;
       }
-      try {
-        return await this.login(email, password);
-      } catch (e) {
-        if (e.message && e.message.toLowerCase().includes('verificar')) throw e;
-        throw new Error('Cuenta creada. Si no puedes entrar, revisa tu correo para verificarla.');
-      }
+      const err = new Error(
+        'Cuenta creada. Te enviamos un correo de verificación a ' + email +
+        '. Ábrelo (también revisa spam) y luego inicia sesión.'
+      );
+      err.code = 'EMAIL_CONFIRM_REQUIRED';
+      err.email = email;
+      throw err;
     }
     return data;
+  },
+
+  async resendVerification(email) {
+    email = this._cleanEmail(email);
+    if (!email) throw new Error('Escribe tu correo.');
+    if (!window.sb) throw new Error('Sin conexión al servidor.');
+    const { error } = await sb.auth.resend({
+      type: 'signup',
+      email,
+      options: { emailRedirectTo: (window.location.origin || '').replace(/\/$/, '') + '/' },
+    });
+    if (error) throw new Error(error.message || 'No se pudo reenviar el correo.');
+    return true;
   },
 
   async login(email, password) {
@@ -259,11 +284,29 @@ const Auth = {
   },
 
   async logout() {
-    if (!CONFIG.DEMO_MODE && window.sb) {
-      try { await sb.auth.signOut(); } catch (_) {}
-    }
     this.currentUser = null;
-    localStorage.removeItem('mp_user');
+    try { localStorage.removeItem('mp_user'); } catch (_) {}
+    if (!CONFIG.DEMO_MODE && window.sb) {
+      try {
+        await sb.auth.signOut({ scope: 'global' });
+      } catch (_) {
+        try { await sb.auth.signOut(); } catch (__) {}
+      }
+    }
+    try {
+      Object.keys(localStorage).forEach((k) => {
+        if (k.startsWith('sb-') || k.indexOf('supabase') >= 0) {
+          localStorage.removeItem(k);
+        }
+      });
+    } catch (_) {}
+    try {
+      Object.keys(sessionStorage).forEach((k) => {
+        if (k.startsWith('sb-') || k.indexOf('supabase') >= 0) {
+          sessionStorage.removeItem(k);
+        }
+      });
+    } catch (_) {}
   },
 
   isLoggedIn() { return !!this.currentUser; },
