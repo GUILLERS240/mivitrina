@@ -1,4 +1,4 @@
-/* Login fiable — espera cliente Supabase antes de autenticar */
+/* Login fiable + carga módulos UI */
 (function () {
   function showLoginError(msg) {
     const errEl = document.getElementById('loginError');
@@ -91,29 +91,36 @@
     });
   }
 
-  function loadSocial() {
-    if (!document.querySelector('link[href="css/social.css"]')) {
-      var l = document.createElement('link');
-      l.rel = 'stylesheet';
-      l.href = 'css/social.css';
-      document.head.appendChild(l);
-    }
-    if (!document.querySelector('script[src="js/social-features.js"]')) {
-      var s = document.createElement('script');
-      s.src = 'js/social-features.js';
-      s.defer = true;
-      document.body.appendChild(s);
-    }
+  function addCss(href) {
+    if (document.querySelector('link[href="' + href + '"]')) return;
+    var l = document.createElement('link');
+    l.rel = 'stylesheet';
+    l.href = href;
+    document.head.appendChild(l);
+  }
+  function addJs(src) {
+    if (document.querySelector('script[src="' + src + '"]')) return;
+    var s = document.createElement('script');
+    s.src = src;
+    s.defer = true;
+    document.body.appendChild(s);
+  }
+
+  function loadExtras() {
+    addCss('css/social.css');
+    addCss('css/ui-polish.css');
+    addJs('js/social-features.js');
+    addJs('js/ui-polish.js');
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function () {
       setTimeout(wire, 50);
-      loadSocial();
+      loadExtras();
     });
   } else {
     setTimeout(wire, 50);
-    loadSocial();
+    loadExtras();
   }
   window.addEventListener('load', function () { setTimeout(wire, 100); });
 })();
