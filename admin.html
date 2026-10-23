@@ -2,61 +2,99 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Panel Admin - Mi Vitrina</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/css/style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
-    .admin-layout { display: flex; min-height: 100vh; }
-    .admin-nav { width: 240px; background: var(--secondary, #1a1a1a); color: #fff; padding: 20px 0; flex-shrink: 0; }
-    .admin-nav .logo { padding: 0 20px 20px; font-weight: 700; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; }
-    .admin-nav a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
-    .admin-nav a:hover, .admin-nav a.active { background: rgba(255,153,0,0.2); color: #fff; }
-    .admin-nav a i { width: 20px; color: var(--primary, #ff7a00); }
-    .admin-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-    .admin-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border); }
-    .admin-content { padding: 24px; flex: 1; overflow: auto; }
+  <style id="admin-modern">
+    :root {
+      --adm-bg: #f3f4f6;
+      --adm-card: #ffffff;
+      --adm-ink: #111827;
+      --adm-muted: #6b7280;
+      --adm-border: #e5e7eb;
+      --adm-primary: #ff7a00;
+      --adm-side: #0f172a;
+    }
+    body { margin: 0; font-family: Inter, system-ui, -apple-system, sans-serif; background: var(--adm-bg); color: var(--adm-ink); }
+    .admin-layout { display: flex; min-height: 100vh; flex-direction: column; }
+    .admin-nav {
+      width: 100%; background: var(--adm-side); color: #fff;
+      display: flex; flex-wrap: nowrap; overflow-x: auto; gap: 4px;
+      padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+      position: sticky; bottom: 0; z-index: 50;
+      -webkit-overflow-scrolling: touch;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+    }
+    .admin-nav .logo { display: none; }
+    .admin-nav a {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 4px; min-width: 68px; padding: 8px 10px; border-radius: 12px;
+      color: rgba(255,255,255,0.7); text-decoration: none; font-size: 0.65rem; font-weight: 600;
+      white-space: nowrap; cursor: pointer; flex-shrink: 0;
+    }
+    .admin-nav a i { font-size: 1.15rem; color: var(--adm-primary); }
+    .admin-nav a:hover, .admin-nav a.active { background: rgba(255,122,0,0.18); color: #fff; }
+    .admin-main { flex: 1; display: flex; flex-direction: column; min-width: 0; padding-bottom: 72px; }
+    .admin-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 16px; background: var(--adm-card);
+      border-bottom: 1px solid var(--adm-border);
+      position: sticky; top: 0; z-index: 40;
+    }
+    .admin-header h1 { margin: 0; font-size: 1.15rem; }
+    .admin-content { padding: 14px; flex: 1; }
     .admin-section { display: none; }
-    .admin-section.active { display: block; }
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; }
-    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
-    th { background: var(--bg); font-weight: 600; }
-    .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
-    .stat-card { background: var(--bg-card); border-radius: 12px; padding: 18px; border: 1px solid var(--border); }
-    .stat-card h3 { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 8px; }
-    .stat-card .num { font-size: 1.6rem; font-weight: 700; }
-    .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; }
-    .btn-primary { background: var(--primary, #ff7a00); color: #111; font-weight: 600; }
-    .btn-danger { background: #e74c3c; color: #fff; }
+    .admin-section.active { display: block; animation: fadeUp 0.25s ease; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+    .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
+    .stat-card {
+      background: var(--adm-card); border-radius: 16px; padding: 16px;
+      border: 1px solid var(--adm-border); box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+    }
+    .stat-card h3 { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--adm-muted); margin: 0 0 8px; font-weight: 600; }
+    .stat-card .num { font-size: 1.55rem; font-weight: 800; letter-spacing: -0.02em; }
+    .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid var(--adm-border); background: var(--adm-card); }
+    table { width: 100%; border-collapse: collapse; min-width: 480px; }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--adm-border); font-size: 0.85rem; }
+    th { background: #f9fafb; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--adm-muted); }
+    tr:last-child td { border-bottom: none; }
+    .btn-sm { padding: 8px 12px; font-size: 0.8rem; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-primary { background: linear-gradient(135deg,#ff9a3c,#ff6a00); color: #111; }
+    .btn-danger { background: #fee2e2; color: #b91c1c; }
     .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; }
-    @media (max-width: 768px) {
-      .admin-layout { flex-direction: column; }
-      .admin-nav { width: 100%; display: flex; flex-wrap: wrap; padding: 10px; gap: 4px; }
-      .admin-nav .logo { width: 100%; border: none; margin: 0; padding: 8px; }
-      .admin-nav a { padding: 8px 12px; font-size: 0.8rem; }
+    input, textarea, select {
+      width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--adm-border);
+      font-size: 16px; background: #fff; box-sizing: border-box;
+    }
+    @media (min-width: 900px) {
+      .admin-layout { flex-direction: row; }
+      .admin-nav {
+        width: 240px; flex-direction: column; flex-wrap: nowrap; overflow: visible;
+        position: sticky; top: 0; bottom: auto; height: 100vh; padding: 20px 0;
+        box-shadow: none;
+      }
+      .admin-nav .logo {
+        display: block; padding: 0 20px 20px; font-weight: 800; font-size: 1.1rem;
+        border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px;
+      }
+      .admin-nav a {
+        flex-direction: row; min-width: 0; padding: 12px 20px; font-size: 0.9rem;
+        border-radius: 0; justify-content: flex-start; gap: 12px;
+      }
+      .admin-nav a i { width: 22px; font-size: 1rem; }
+      .admin-main { padding-bottom: 0; }
+      .admin-content { padding: 24px; }
+      .stats { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
     }
   </style>
 </head>
 <body>
   <div class="admin-layout">
-    <nav class="admin-nav">
-      <div class="logo">Mi Vitrina Admin</div>
-      <a data-section="dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
-      <a data-section="users"><i class="fas fa-users"></i> Usuarios</a>
-      <a data-section="sellers"><i class="fas fa-store"></i> Solicitudes vendedor</a>
-      <a data-section="managers"><i class="fas fa-handshake"></i> Gestores</a>
-      <a data-section="stores"><i class="fas fa-shop"></i> Tiendas</a>
-      <a data-section="orders"><i class="fas fa-box"></i> Pedidos</a>
-      <a data-section="announce"><i class="fas fa-bullhorn"></i> Anuncios</a>
-      <a data-section="home"><i class="fas fa-home"></i> Inicio / Apariencia</a>
-      <a href="index.html"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
-    </nav>
     <div class="admin-main">
       <header class="admin-header">
         <h1 id="secTitle">Dashboard</h1>
-        <div>Admin: <strong id="adminName">—</strong></div>
+        <div style="font-size:0.8rem;color:var(--adm-muted)">Admin: <strong id="adminName" style="color:var(--adm-ink)">—</strong></div>
       </header>
       <div class="admin-content">
         <section id="sec-dashboard" class="admin-section active">
@@ -75,11 +113,11 @@
           <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Slug</th><th>Verificada</th><th>Activa</th></tr></thead><tbody id="storesBody"></tbody></table></div>
         </section>
         <section id="sec-announce" class="admin-section">
-          <h2>Anuncio a todos los usuarios</h2>
-          <p style="color:var(--text-muted);margin-bottom:16px">Notificación interna (texto o imagen + texto).</p>
-          <div style="max-width:520px;background:var(--bg-card,#fff);padding:20px;border-radius:12px;border:1px solid var(--border,#eee)">
-            <div class="form-group" style="margin-bottom:12px"><label>Título *</label><input type="text" id="annTitle" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border)" placeholder="Título del anuncio"></div>
-            <div class="form-group" style="margin-bottom:12px"><label>Mensaje</label><textarea id="annBody" rows="3" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border)" placeholder="Texto"></textarea></div>
+          <h2 style="margin-top:0">Anuncio a todos</h2>
+          <p style="color:var(--adm-muted);margin-bottom:16px">Notificación interna (texto o imagen + texto).</p>
+          <div style="max-width:520px;background:var(--adm-card);padding:20px;border-radius:16px;border:1px solid var(--adm-border)">
+            <div class="form-group" style="margin-bottom:12px"><label>Título *</label><input type="text" id="annTitle" placeholder="Título del anuncio"></div>
+            <div class="form-group" style="margin-bottom:12px"><label>Mensaje</label><textarea id="annBody" rows="3" placeholder="Texto"></textarea></div>
             <div class="form-group" style="margin-bottom:12px"><label>Imagen (opcional)</label><input type="file" id="annImage" accept="image/*"></div>
             <button type="button" class="btn-sm btn-primary" id="btnSendAnn">Enviar a todos</button>
           </div>
@@ -92,13 +130,25 @@
         </section>
       </div>
     </div>
+    <nav class="admin-nav">
+      <div class="logo">Mi Vitrina Admin</div>
+      <a data-section="dashboard" class="active"><i class="fas fa-chart-line"></i> Inicio</a>
+      <a data-section="users"><i class="fas fa-users"></i> Users</a>
+      <a data-section="sellers"><i class="fas fa-store"></i> Vendedores</a>
+      <a data-section="managers"><i class="fas fa-handshake"></i> Gestores</a>
+      <a data-section="stores"><i class="fas fa-shop"></i> Tiendas</a>
+      <a data-section="orders"><i class="fas fa-box"></i> Pedidos</a>
+      <a data-section="announce"><i class="fas fa-bullhorn"></i> Anuncios</a>
+      <a data-section="home"><i class="fas fa-palette"></i> Apariencia</a>
+      <a href="/"><i class="fas fa-arrow-left"></i> Salir</a>
+    </nav>
   </div>
   <div id="toastContainer"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/supabase-client.js"></script>
-  <script src="js/ensure-client.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/supabase-client.js"></script>
+  <script src="/js/ensure-client.js"></script>
+  <script src="/js/auth.js"></script>
   <script>
     function toast(msg, type) {
       const c = document.getElementById('toastContainer');
@@ -126,7 +176,7 @@
       }
       if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
         toast(!Auth.isLoggedIn() ? 'Debes iniciar sesión como administrador' : 'Solo guillers240@gmail.com puede acceder', 'error');
-        setTimeout(() => { location.href = 'index.html'; }, 1400);
+        setTimeout(() => { location.href = '/'; }, 1400);
         return;
       }
       document.getElementById('adminName').textContent = Auth.getUser().email;
@@ -162,7 +212,7 @@
         ['Tiendas', stores.count||0],
         ['Productos', products.count||0],
         ['Pedidos', orders.count||0],
-        ['Solicitudes pendientes', pending.count||0],
+        ['Solicitudes', pending.count||0],
       ].map(([h,n]) => `<div class="stat-card"><h3>${h}</h3><div class="num">${n}</div></div>`).join('');
     }
 
@@ -263,6 +313,6 @@
 
     document.addEventListener('DOMContentLoaded', init);
   </script>
-  <script src="js/admin-home.js"></script>
+  <script src="/js/admin-home.js"></script>
 </body>
 </html>
