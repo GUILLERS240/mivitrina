@@ -119,8 +119,12 @@ function renderWishlistItems(products) {
 }
 
 function openCheckout() {
-  if (typeof Auth === 'undefined' || !Auth.isLoggedIn()) { openAuthModal('login'); return; }
   if (!State.cart?.length) { toast('El carrito está vacío'); return; }
+  if (typeof Auth === 'undefined' || !Auth.isLoggedIn()) {
+    if (typeof openGuestCheckout === 'function') { openGuestCheckout(); return; }
+    openAuthModal('login');
+    return;
+  }
   const user = Auth.getUser();
   const cfg = SiteConfig.checkout;
   const panel = document.getElementById('checkoutPanel');
@@ -196,6 +200,8 @@ function openCheckout() {
         shipping_address: user.address,
         payment_method: pay,
         shipping_method: ship,
+        payer_name: user.name,
+        payer_phone: user.phone,
         items: State.cart.map((i) => ({
           product_id: i.product_id, name: i.name, image: i.image,
           quantity: i.quantity, unit_price: i.price, price: i.price, store_id: i.store_id,
@@ -235,3 +241,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const list = document.getElementById('ordersList');
   if (list) _obsOrders.observe(list, { childList: true, subtree: true });
 });
+
+/* Carga checkout de invitados */
+(function () {
+  if (document.querySelector('script[data-guest-checkout]')) return;
+  const s = document.createElement('script');
+  s.src = '/js/guest-checkout.js';
+  s.async = true;
+  s.dataset.guestCheckout = '1';
+  document.head.appendChild(s);
+})();
