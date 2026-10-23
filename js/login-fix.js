@@ -109,8 +109,10 @@
   function loadExtras() {
     addCss('css/social.css');
     addCss('css/ui-polish.css');
+    addCss('css/profile-fix.css');
     addJs('js/social-features.js');
     addJs('js/ui-polish.js');
+    addJs('js/profile-fix.js');
   }
 
   if (document.readyState === 'loading') {
