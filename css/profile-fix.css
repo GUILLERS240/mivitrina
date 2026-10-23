@@ -147,6 +147,36 @@
   margin-bottom: 12px;
 }
 
+/* Cerrar sesión al final del perfil */
+.profile-logout-wrap {
+  margin-top: 8px;
+  padding-top: 8px;
+}
+.profile-logout-wrap.hidden { display: none !important; }
+.btn-logout-profile {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.15s;
+}
+.btn-logout-profile:active {
+  transform: scale(0.98);
+  background: #fee2e2;
+}
+.btn-logout-profile i {
+  font-size: 1rem;
+}
+
 .categories-grid,
 #categoriesGrid {
   display: grid !important;
