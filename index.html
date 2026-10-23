@@ -1,1 +1,175 @@
-NEED_FULL
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Mi Vitrina - Tienda Online</title>
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/mobile.css">
+  <link rel="stylesheet" href="/css/amazon.css">
+  <link rel="stylesheet" href="/css/auth-mobile.css">
+  <link rel="stylesheet" href="/css/skeleton-enhance.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .btn-google { display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px 16px;margin-top:12px;background:#fff;color:#333;border:1px solid #dadce0;border-radius:8px;font-weight:500;font-size:0.95rem;cursor:pointer; }
+    .auth-divider { display:flex;align-items:center;gap:12px;margin:16px 0;color:var(--text-muted);font-size:0.8rem; }
+    .auth-divider::before,.auth-divider::after { content:'';flex:1;height:1px;background:var(--border); }
+  </style>
+</head>
+<body>
+  <div id="appSplash" class="app-splash"><div class="splash-inner"><img class="splash-logo" src="/icon.svg" alt="Mi Vitrina"><div class="splash-spinner"></div><div class="splash-text">Mi Vitrina</div></div></div>
+  <header class="header">
+    <div class="header-left">
+      <a href="#" class="logo" data-view="inicio" aria-label="Mi Vitrina">
+        <img class="logo-img" src="/icon.svg" alt="" width="36" height="36">
+        <span class="logo-text">Mi <strong>Vitrina</strong></span>
+      </a>
+    </div>
+    <div class="search-bar">
+      <i class="fas fa-magnifying-glass"></i>
+      <input type="text" id="searchInput" placeholder="Buscar en Mi Vitrina" autocomplete="off">
+    </div>
+    <div class="header-right">
+      <div id="guestActions" class="auth-actions">
+        <button class="btn btn-outline" id="btnLogin">Iniciar sesión</button>
+        <button class="btn btn-primary" id="btnRegister">Registrarse</button>
+      </div>
+      <div id="userActions" class="user-actions hidden">
+        <button class="icon-btn" id="btnMessages" title="Mensajes"><i class="fas fa-comment-dots"></i><span class="badge" id="msgBadge" data-count="0">0</span></button>
+        <button class="icon-btn" id="btnNotifications" title="Notificaciones"><i class="fas fa-bell"></i><span class="badge" id="notifBadge" data-count="0">0</span></button>
+        <button class="icon-btn" id="btnCart" title="Carrito"><i class="fas fa-cart-shopping"></i><span class="badge" id="cartBadge" data-count="0">0</span></button>
+        <div class="user-menu desktop-only">
+          <button class="avatar-btn" id="avatarBtn"><img id="userAvatar" src="https://ui-avatars.com/api/?name=Usuario&background=0D8ABC&color=fff" alt="Avatar"></button>
+          <div class="dropdown hidden" id="userDropdown">
+            <a href="#" data-view="perfil"><i class="fas fa-user"></i> Mi Perfil</a>
+            <a href="#" id="goSellerPanel" class="hidden"><i class="fas fa-store"></i> Panel Vendedor</a>
+            <a href="#" id="goAdminPanel" class="hidden"><i class="fas fa-shield-alt"></i> Panel Admin</a>
+            <hr><a href="#" id="btnLogout"><i class="fas fa-sign-out-alt"></i> Cerrar sesión</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="main-content">
+    <section id="view-inicio" class="view active">
+      <div class="hero-banner">
+        <div class="hero-content">
+          <h2>Todo lo que necesitas, en un solo lugar</h2>
+          <p>Descubre productos con la mejor calidad y los mejores precios.</p>
+          <button type="button" class="btn btn-primary hero-cta" id="btnHeroOffers">Ver ofertas</button>
+        </div>
+      </div>
+      <div class="home-cat-strip" id="homeCatStrip"></div>
+      <div class="section-header"><h1>Productos</h1>
+        <div class="filters-row">
+          <button type="button" class="filter-chip" id="btnCategorySheet"><span id="categoryLabel">Categoría</span></button>
+          <button type="button" class="filter-chip" id="btnSortSheet">Ordenar</button>
+          <select id="categoryFilter" class="hidden"><option value="">Todas</option></select>
+          <select id="sortFilter" class="hidden"><option value="">Relevancia</option></select>
+        </div>
+      </div>
+      <div class="products-grid" id="productsGrid"></div>
+    </section>
+    <section id="view-categorias" class="view"><div class="section-header"><h1>Categorías</h1></div><div id="categoriesGrid" class="categories-grid"></div></section>
+    <section id="view-tiendas" class="view"><div class="section-header"><h1>Tiendas</h1></div><div class="stores-grid" id="storesGrid"></div></section>
+    <section id="view-pedidos" class="view"><div class="section-header"><h1>Mis pedidos</h1></div><div id="ordersList"></div><div id="ordersEmpty" class="empty-state-block hidden"><i class="fas fa-box-open"></i><p>Aún no tienes pedidos</p></div></section>
+    <section id="view-perfil" class="view">
+      <div class="profile-container">
+        <div class="profile-menu-card profile-card"><nav class="profile-menu-list" id="profileMenuList"></nav></div>
+        <div class="profile-card" id="settingsCard"><p class="profile-section-title">Configuración</p>
+          <div class="setting-item"><span>Sonidos</span><label class="switch"><input type="checkbox" id="soundToggle" checked><span class="slider"></span></label></div>
+        </div>
+        <form id="profileForm" class="profile-card">
+          <div class="profile-avatar" style="text-align:center;margin-bottom:12px"><img id="profileAvatar" src="https://ui-avatars.com/api/?name=Usuario&background=0D8ABC&color=fff" alt="" style="width:72px;height:72px;border-radius:50%"></div>
+          <div class="form-group"><label>Nombre</label><input id="profName"></div>
+          <div class="form-group"><label>Correo</label><input id="profEmail" type="email" readonly></div>
+          <div class="form-group"><label>Teléfono</label><input id="profPhone" type="tel"></div>
+          <div class="form-group"><label>Edad</label><input id="profAge" type="number" min="1"></div>
+          <div class="form-group"><label>Dirección</label><textarea id="profAddress" rows="2"></textarea></div>
+          <div class="form-group"><label>Notas</label><textarea id="profNotes" rows="2"></textarea></div>
+          <button type="submit" class="btn btn-primary btn-block">Guardar</button>
+        </form>
+        <div class="profile-card"><div id="sellerRequestStatus"></div><div id="sellerRequestFormWrap" class="hidden">
+          <form id="sellerRequestForm">
+            <div class="form-group"><label>Nombre de tienda</label><input id="reqStoreName" required></div>
+            <div class="form-group"><label>Descripción</label><textarea id="reqStoreDesc"></textarea></div>
+            <div class="form-group"><label>Categoría</label><select id="reqStoreCategory"><option value="general">General</option><option value="ropa">Ropa</option><option value="tecnologia">Tecnología</option></select></div>
+            <div class="form-group"><label>Logo</label><input type="file" id="reqStoreLogoFile" accept="image/*"></div>
+            <div class="form-group"><label>Banner</label><input type="file" id="reqStoreBannerFile" accept="image/*"></div>
+            <button type="submit" class="btn btn-primary">Enviar solicitud</button>
+            <button type="button" class="btn btn-outline" id="cancelSellerReq">Cancelar</button>
+          </form></div>
+        </div>
+        <div class="profile-card"><div id="referralCodeBox"></div><div id="managerRequestStatus"></div></div>
+        <div class="mobile-only-block">
+          <a href="/seller.html" id="profileGoSeller" class="btn btn-secondary hidden" style="display:block;margin-bottom:8px">Panel Vendedor</a>
+          <a href="/admin.html" id="profileGoAdmin" class="btn btn-secondary hidden" style="display:block">Panel Admin</a>
+        </div>
+      </div>
+    </section>
+    <section id="view-ayuda" class="view"><div class="section-header"><h1>Centro de ayuda</h1></div><p style="padding:16px">Contacta soporte o revisa tus pedidos.</p></section>
+  </main>
+  <nav class="bottom-nav">
+    <button type="button" class="nav-item active" data-view="inicio"><i class="fas fa-house"></i><span>Inicio</span></button>
+    <button type="button" class="nav-item" data-view="categorias"><i class="fas fa-th-large"></i><span>Categoría</span></button>
+    <button type="button" class="nav-item" data-view="tiendas"><i class="fas fa-store"></i><span>Tiendas</span></button>
+    <button type="button" class="nav-item" data-view="pedidos"><i class="fas fa-box"></i><span>Pedidos</span></button>
+    <button type="button" class="nav-item" data-view="perfil"><i class="fas fa-user"></i><span>Mi Perfil</span></button>
+  </nav>
+  <div id="authModal" class="modal hidden"><div class="modal-content auth-modal">
+    <button type="button" class="close-btn" id="closeAuth"><i class="fas fa-times"></i></button>
+    <div class="auth-tabs"><button type="button" class="tab active" data-tab="login">Entrar</button><button type="button" class="tab" data-tab="register">Registro</button></div>
+    <form id="loginForm" class="auth-form">
+      <div class="form-group"><label>Correo</label><input type="email" id="loginEmail" required autocomplete="username"></div>
+      <div class="form-group"><label>Contraseña</label><input type="password" id="loginPassword" required autocomplete="current-password"></div>
+      <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>
+      <div class="auth-divider">o</div>
+      <button type="button" class="btn-google" id="btnGoogleLogin"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt=""> Continuar con Google</button>
+    </form>
+    <form id="registerForm" class="auth-form hidden">
+      <div class="form-group"><label>Nombre</label><input type="text" id="regName" required></div>
+      <div class="form-group"><label>Correo</label><input type="email" id="regEmail" required autocomplete="email"></div>
+      <div class="form-group"><label>Contraseña</label><input type="password" id="regPassword" required minlength="6" autocomplete="new-password"></div>
+      <div class="form-group"><label>Confirmar</label><input type="password" id="regPassword2" required minlength="6" autocomplete="new-password"></div>
+      <button type="submit" class="btn btn-primary btn-block">Crear cuenta</button>
+      <div class="auth-divider">o</div>
+      <button type="button" class="btn-google" id="btnGoogleRegister"><img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt=""> Continuar con Google</button>
+    </form>
+  </div></div>
+  <div id="cartPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Carrito</h2><button class="close-btn" id="closeCart"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="cartItems"></div><div class="side-panel-footer"><div class="cart-total"><span>Total:</span><strong id="cartTotal">$0</strong></div><button class="btn btn-primary btn-block" id="btnCheckout">Proceder al pago</button></div></div>
+  <div id="messagesPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Mensajes</h2><button class="close-btn" id="closeMessages"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="messagesList"></div></div>
+  <div id="notificationsPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Notificaciones</h2><button class="close-btn" id="closeNotifications"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="notificationsList"></div></div>
+  <div id="chatPanel" class="side-panel hidden"><div class="side-panel-header"><button type="button" id="backToMessages" class="icon-btn"><i class="fas fa-arrow-left"></i></button><h2 id="chatTitle">Chat</h2><button class="close-btn" id="closeChat"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="chatMessages"></div><div class="side-panel-footer chat-input-row"><input type="text" id="chatInput" placeholder="Escribe un mensaje..."><button type="button" id="btnSendChat" class="btn btn-primary"><i class="fas fa-paper-plane"></i></button></div></div>
+  <div id="sheetCategory" class="bottom-sheet hidden"><div class="sheet-handle"></div><h3>Categoría</h3><div class="sheet-options" id="categoryOptions">
+    <button type="button" data-value="" class="sheet-opt active">Todas</button>
+    <button type="button" data-value="electronica" class="sheet-opt">Electrónica</button>
+    <button type="button" data-value="ropa" class="sheet-opt">Ropa</button>
+    <button type="button" data-value="hogar" class="sheet-opt">Hogar</button>
+  </div></div>
+  <div id="sheetSort" class="bottom-sheet hidden"><div class="sheet-handle"></div><h3>Ordenar por</h3><div class="sheet-options" id="sortOptions">
+    <button type="button" data-value="" class="sheet-opt active">Relevancia</button>
+    <button type="button" data-value="precio-asc" class="sheet-opt">Precio: menor a mayor</button>
+    <button type="button" data-value="precio-desc" class="sheet-opt">Precio: mayor a menor</button>
+  </div></div>
+  <div id="productModal" class="modal hidden"><div class="modal-content modal-product"><button type="button" class="close-btn" id="closeProduct"><i class="fas fa-times"></i></button><div id="productDetail" class="product-detail-sheet"></div></div></div>
+  <div id="wishlistPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Lista de deseos</h2><button type="button" class="close-btn" id="closeWishlist"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="wishlistItems"></div></div>
+  <div id="checkoutPanel" class="side-panel hidden"><div class="side-panel-header"><h2>Finalizar compra</h2><button type="button" class="close-btn" id="closeCheckout"><i class="fas fa-times"></i></button></div><div class="side-panel-body" id="checkoutBody"></div></div>
+  <div id="toastContainer"></div><div id="overlay" class="overlay hidden"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.min.js"></script>
+  <script src="/js/config.js"></script>
+  <script src="/js/data.js"></script>
+  <script src="/js/supabase-client.js"></script>
+  <script src="/js/ensure-client.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/features.js"></script>
+  <script src="/js/ui-patch.js"></script>
+  <script src="/js/login-fix.js"></script>
+  <script src="/js/guest-checkout.js"></script>
+  <script>if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('/sw.js').catch(()=>{});});}</script>
+</body>
+</html>
