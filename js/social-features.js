@@ -1,5 +1,5 @@
 /**
- * Mi Vitrina — badges verificados, reseñas, favoritos, ubicación
+ * Mi Vitrina — badges, reseñas, favoritos, ubicación, tiendas
  */
 (function () {
   const CUBA = {
@@ -27,7 +27,7 @@
     const half = r - full >= 0.5 ? 1 : 0;
     let h = '<span class="stars-row" title="' + r.toFixed(1) + '">';
     for (let i = 0; i < 5; i++) {
-      if (i < full) h += '<i class="fas fa-star star-on"></i>';
+      if (i < full)) h += '<i class="fas fa-star star-on"></i>';
       else if (i === full && half) h += '<i class="fas fa-star-half-alt star-on"></i>';
       else h += '<i class="far fa-star star-off"></i>';
     }
@@ -129,18 +129,24 @@
     grid.innerHTML = typeof storeSkeletonHTML === 'function' ? storeSkeletonHTML(4) : '';
     await new Promise((r) => setTimeout(r, 280));
     let stores = [];
-    try { stores = await DataService.getStores(); } catch (_) {}
+    try { stores = await DataService.getStores(); } catch (e) { console.warn(e); }
+    if (!Array.isArray(stores)) stores = [];
+    const allStores = stores.slice();
     const loc = getLocationPref();
     if (loc && loc.province && !loc.all) {
-      stores = stores.filter((s) => !s.province || s.province === loc.province);
-      if (loc.municipality) {
-        const m = stores.filter((s) => s.municipality === loc.municipality);
-        if (m.length) stores = m;
+      const byProv = stores.filter((s) => !s.province || s.province === loc.province);
+      if (byProv.length) {
+        stores = byProv;
+        if (loc.municipality) {
+          const byMun = stores.filter((s) => !s.municipality || s.municipality === loc.municipality);
+          if (byMun.length) stores = byMun;
+        }
       }
+      if (!stores.length && allStores.length) stores = allStores;
     }
     if (window.State) State.stores = stores;
     if (!stores.length) {
-      grid.innerHTML = '<div class="empty-state-block" style="grid-column:1/-1"><i class="fas fa-store"></i><p><strong>No hay tiendas en esta zona</strong></p><p>Cambia tu ubicación o elige ver todas.</p></div>';
+      grid.innerHTML = '<div class="empty-state-block" style="grid-column:1/-1"><i class="fas fa-store"></i><p><strong>Aún no hay tiendas</strong></p><p>Los vendedores aprobados aparecerán aquí.</p></div>';
       return;
     }
     grid.innerHTML = stores.map((s) => {
@@ -323,7 +329,6 @@
         if (typeof toast === 'function') toast('Elige una provincia o marca ver todas', 'error');
         return;
       }
-
       const pref = { all: !!all, province: province, municipality: municipality, setAt: Date.now() };
       setLocationPref(pref);
       window._locationChosen = true;
@@ -339,7 +344,6 @@
       if (window.State && State.currentView === 'tiendas' && typeof renderStoresEnhanced === 'function') {
         try { renderStoresEnhanced(); } catch (_) {}
       }
-
       if (window.sb && typeof Auth !== 'undefined' && Auth.isLoggedIn()) {
         sb.from('profiles').update({
           preferred_province: province || null,
