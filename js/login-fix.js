@@ -1,4 +1,4 @@
-/* Fix login móvil — manejador fiable */
+/* Login fiable — espera cliente Supabase antes de autenticar */
 (function () {
   function showLoginError(msg) {
     const errEl = document.getElementById('loginError');
@@ -24,7 +24,7 @@
       errEl.classList.add('hidden');
     }
 
-    await new Promise((r) => setTimeout(r, 50));
+    await new Promise((r) => setTimeout(r, 40));
 
     let email = (emailEl?.value || '').replace(/[\u200B-\u200D\uFEFF]/g, '').trim().toLowerCase();
     let password = (passEl?.value || '').replace(/[\u200B-\u200D\uFEFF]/g, '').replace(/^\s+|\s+$/g, '');
@@ -33,16 +33,25 @@
       showLoginError('Escribe correo y contraseña.');
       return;
     }
-    if (!window.sb && !(window.CONFIG && CONFIG.DEMO_MODE)) {
-      showLoginError('Sin conexión al servidor. Recarga la página.');
-      return;
-    }
 
     if (btn) {
       btn.disabled = true;
-      btn.textContent = 'Entrando...';
+      btn.textContent = 'Conectando...';
     }
+
     try {
+      if (typeof ensureClient === 'function') {
+        const client = await ensureClient(8000);
+        if (!client && !(window.CONFIG && CONFIG.DEMO_MODE)) {
+          showLoginError('No se pudo conectar con el servidor. Revisa tu internet y recarga.');
+          return;
+        }
+      } else if (!window.sb && !(window.CONFIG && CONFIG.DEMO_MODE)) {
+        showLoginError('Sin conexión al servidor. Recarga la página.');
+        return;
+      }
+
+      if (btn) btn.textContent = 'Entrando...';
       await Auth.login(email, password);
       if (typeof closeAuthModal === 'function') closeAuthModal();
       if (typeof updateAuthUI === 'function') updateAuthUI();
@@ -73,6 +82,7 @@
     document.getElementById('btnGoogleLogin')?.addEventListener('click', async (e) => {
       e.preventDefault();
       try {
+        if (typeof ensureClient === 'function') await ensureClient(5000);
         await Auth.loginWithGoogle();
       } catch (err) {
         showLoginError(err.message || 'Error con Google');
