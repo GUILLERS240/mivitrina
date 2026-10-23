@@ -5,9 +5,44 @@
   function qs(sel, root) { return (root || document).querySelector(sel); }
   function qsa(sel, root) { return Array.from((root || document).querySelectorAll(sel)); }
 
+  function ensureLogoutButton() {
+    const container = qs('.profile-container');
+    if (!container) return;
+    let wrap = document.getElementById('profileLogoutWrap');
+    if (!wrap) {
+      wrap = document.createElement('div');
+      wrap.id = 'profileLogoutWrap';
+      wrap.className = 'profile-logout-wrap';
+      wrap.innerHTML =
+        '<button type="button" class="btn-logout-profile" id="btnLogoutProfile">' +
+        '<i class="fas fa-right-from-bracket"></i> Cerrar sesión</button>';
+      container.appendChild(wrap);
+    }
+    const btn = document.getElementById('btnLogoutProfile');
+    if (btn && !btn._wired) {
+      btn._wired = true;
+      btn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        try {
+          if (typeof teardownRealtime === 'function') teardownRealtime();
+          if (typeof Auth !== 'undefined' && Auth.logout) await Auth.logout();
+          if (typeof updateAuthUI === 'function') updateAuthUI();
+          if (typeof toast === 'function') toast('Sesión cerrada', 'success');
+          if (typeof switchView === 'function') switchView('inicio');
+        } catch (err) {
+          if (typeof toast === 'function') toast(err.message || 'Error al cerrar sesión', 'error');
+        }
+      });
+    }
+  }
+
   function ensurePanels() {
     const container = qs('.profile-container');
-    if (!container || container.dataset.panelsReady) return;
+    if (!container) return;
+    if (container.dataset.panelsReady) {
+      ensureLogoutButton();
+      return;
+    }
     container.dataset.panelsReady = '1';
 
     let hero = qs('.profile-hero', container);
@@ -101,6 +136,7 @@
       else if (typeof toast === 'function') toast('Lista de deseos');
     });
 
+    ensureLogoutButton();
     syncHero();
     wireThemeInConfig();
   }
@@ -111,6 +147,8 @@
     qsa('.profile-panel', container).forEach(function (p) { p.classList.add('hidden'); });
     const menu = qs('.profile-menu-card', container);
     if (menu) menu.classList.add('hidden');
+    const logout = document.getElementById('profileLogoutWrap');
+    if (logout) logout.classList.add('hidden');
     const panel = document.getElementById(id);
     if (panel) {
       panel.classList.remove('hidden');
@@ -133,6 +171,8 @@
     qsa('.profile-panel', container).forEach(function (p) { p.classList.add('hidden'); });
     const menu = qs('.profile-menu-card', container);
     if (menu) menu.classList.remove('hidden');
+    const logout = document.getElementById('profileLogoutWrap');
+    if (logout) logout.classList.remove('hidden');
     const hero = qs('.profile-hero', container);
     if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -193,6 +233,7 @@
 
   function boot() {
     ensurePanels();
+    ensureLogoutButton();
     syncHero();
   }
 
@@ -201,6 +242,7 @@
     if (typeof prev === 'function') prev();
     setTimeout(function () {
       ensurePanels();
+      ensureLogoutButton();
       syncHero();
     }, 100);
   };
