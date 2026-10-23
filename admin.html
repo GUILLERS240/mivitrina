@@ -9,18 +9,18 @@
   <style>
     body { margin: 0; font-family: Inter, system-ui, sans-serif; background: var(--bg); color: var(--text); }
     .admin-layout { display: flex; min-height: 100vh; }
-    .admin-nav { width: 240px; background: var(--secondary); color: #fff; padding: 20px 0; flex-shrink: 0; }
+    .admin-nav { width: 240px; background: var(--secondary, #1a1a1a); color: #fff; padding: 20px 0; flex-shrink: 0; }
     .admin-nav .logo { padding: 0 20px 20px; font-weight: 700; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 12px; }
     .admin-nav a { display: flex; align-items: center; gap: 10px; padding: 12px 20px; color: rgba(255,255,255,0.8); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
     .admin-nav a:hover, .admin-nav a.active { background: rgba(255,153,0,0.2); color: #fff; }
-    .admin-nav a i { width: 20px; color: var(--primary); }
+    .admin-nav a i { width: 20px; color: var(--primary, #ff7a00); }
     .admin-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
-    .admin-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--bg-card); border-bottom: 1px solid var(--border); }
+    .admin-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: var(--bg-card, #fff); border-bottom: 1px solid var(--border); }
     .admin-content { padding: 24px; flex: 1; overflow: auto; }
     .admin-section { display: none; }
     .admin-section.active { display: block; }
     .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow); }
+    table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden; }
     th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
     th { background: var(--bg); font-weight: 600; }
     .stats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
@@ -28,11 +28,9 @@
     .stat-card h3 { font-size: 0.8rem; color: var(--text-muted); margin: 0 0 8px; }
     .stat-card .num { font-size: 1.6rem; font-weight: 700; }
     .btn-sm { padding: 6px 10px; font-size: 0.8rem; border-radius: 6px; border: none; cursor: pointer; }
-    .btn-primary { background: var(--primary); color: #111; font-weight: 600; }
-    .btn-danger { background: var(--danger); color: #fff; }
-    .form-group { display: flex; flex-direction: column; gap: 6px; }
-    .form-group label { font-size: 0.85rem; font-weight: 600; }
-    .form-group input, .form-group textarea { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-card); color: var(--text); }
+    .btn-primary { background: var(--primary, #ff7a00); color: #111; font-weight: 600; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .form-group label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.85rem; }
     @media (max-width: 768px) {
       .admin-layout { flex-direction: column; }
       .admin-nav { width: 100%; display: flex; flex-wrap: wrap; padding: 10px; gap: 4px; }
@@ -44,159 +42,169 @@
 <body>
   <div class="admin-layout">
     <nav class="admin-nav">
-      <div class="logo"><i class="fas fa-shield-alt"></i> Admin Panel</div>
-      <a class="active" data-section="dashboard"><i class="fas fa-chart-line"></i> Dashboard</a>
+      <div class="logo">Mi Vitrina Admin</div>
+      <a data-section="dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
       <a data-section="users"><i class="fas fa-users"></i> Usuarios</a>
-      <a data-section="sellers"><i class="fas fa-store"></i> Solicitudes Vendedor</a>
+      <a data-section="sellers"><i class="fas fa-store"></i> Solicitudes vendedor</a>
       <a data-section="managers"><i class="fas fa-handshake"></i> Gestores</a>
       <a data-section="stores"><i class="fas fa-shop"></i> Tiendas</a>
-      <a data-section="orders"><i class="fas fa-shopping-bag"></i> Pedidos</a>
-      <a href="index.html" style="margin-top:20px"><i class="fas fa-arrow-left"></i> Volver a la web</a>
+      <a data-section="orders"><i class="fas fa-box"></i> Pedidos</a>
+      <a data-section="announce"><i class="fas fa-bullhorn"></i> Anuncios</a>
+      <a data-section="home"><i class="fas fa-home"></i> Inicio / Apariencia</a>
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Volver a la tienda</a>
     </nav>
     <div class="admin-main">
       <header class="admin-header">
-        <h2 id="sectionTitle">Dashboard</h2>
-        <div>
-          <span style="color:var(--text-muted);font-size:0.85rem">Admin:</span>
-          <strong id="adminName">—</strong>
-        </div>
+        <h1 id="secTitle">Dashboard</h1>
+        <div>Admin: <strong id="adminName">—</strong></div>
       </header>
       <div class="admin-content">
         <section id="sec-dashboard" class="admin-section active">
           <div class="stats" id="dashStats"></div>
         </section>
         <section id="sec-users" class="admin-section">
-          <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Teléfono</th><th>Edad</th></tr></thead><tbody id="usersBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Alta</th></tr></thead><tbody id="usersBody"></tbody></table></div>
         </section>
         <section id="sec-sellers" class="admin-section">
-          <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Tienda</th><th>Categoría</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="requestsBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Tienda</th><th>Usuario</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="sellersBody"></tbody></table></div>
         </section>
         <section id="sec-managers" class="admin-section">
-          <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Fecha</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="managersBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Usuario</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="managersBody"></tbody></table></div>
         </section>
         <section id="sec-stores" class="admin-section">
-          <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Slug</th><th>Categoría</th><th>Estado</th></tr></thead><tbody id="storesBody"></tbody></table></div>
+          <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Slug</th><th>Verificada</th><th>Activa</th></tr></thead><tbody id="storesBody"></tbody></table></div>
+        </section>
+        <section id="sec-announce" class="admin-section">
+          <h2>Anuncio a todos los usuarios</h2>
+          <p style="color:var(--text-muted);margin-bottom:16px">Notificación interna (texto o imagen + texto).</p>
+          <div style="max-width:520px;background:var(--bg-card,#fff);padding:20px;border-radius:12px;border:1px solid var(--border,#eee)">
+            <div class="form-group" style="margin-bottom:12px"><label>Título *</label><input type="text" id="annTitle" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border)" placeholder="Título del anuncio"></div>
+            <div class="form-group" style="margin-bottom:12px"><label>Mensaje</label><textarea id="annBody" rows="3" style="width:100%;padding:10px;border-radius:8px;border:1px solid var(--border)" placeholder="Texto"></textarea></div>
+            <div class="form-group" style="margin-bottom:12px"><label>Imagen (opcional)</label><input type="file" id="annImage" accept="image/*"></div>
+            <button type="button" class="btn-sm btn-primary" id="btnSendAnn">Enviar a todos</button>
+          </div>
         </section>
         <section id="sec-orders" class="admin-section">
           <div class="table-wrap"><table><thead><tr><th>ID</th><th>Total</th><th>Estado</th><th>Pago</th><th>Fecha</th></tr></thead><tbody id="ordersBody"></tbody></table></div>
+        </section>
+        <section id="sec-home" class="admin-section">
+          <div id="homeEditor"></div>
         </section>
       </div>
     </div>
   </div>
   <div id="toastContainer"></div>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.8/dist/umd/supabase.min.js"></script>
   <script src="js/config.js"></script>
   <script src="js/supabase-client.js"></script>
+  <script src="js/ensure-client.js"></script>
   <script src="js/auth.js"></script>
   <script>
-    function toast(msg, type='') {
+    function toast(msg, type) {
       const c = document.getElementById('toastContainer');
-      if (!c) return alert(msg);
       const el = document.createElement('div');
-      el.className = 'toast ' + type;
       el.textContent = msg;
-      el.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#333;color:#fff;padding:12px 16px;border-radius:8px;z-index:9999';
-      if (type==='success') el.style.background = '#28a745';
-      if (type==='error') el.style.background = '#dc3545';
+      el.style.cssText = 'position:relative;margin-bottom:8px;padding:12px 16px;border-radius:10px;background:'+(type==='success'?'#1e2a22':'#1a1a1a')+';color:#fff;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,.25)';
+      c.style.cssText = 'position:fixed;top:16px;right:16px;z-index:99999';
       c.appendChild(el);
-      setTimeout(() => el.remove(), 3000);
+      setTimeout(() => el.remove(), 3200);
     }
-    function formatPrice(n) { return (window.CONFIG?.CURRENCY_SYMBOL||'$') + Number(n).toLocaleString('es-CO'); }
+    function formatPrice(n) { return '$' + Number(n||0).toLocaleString('es-CU'); }
+
     async function init() {
-      await Auth.init();
+      if (typeof ensureClient === 'function') await ensureClient(8000);
+      for (let i = 0; i < 6; i++) {
+        await Auth.init();
+        if (Auth.isLoggedIn()) break;
+        await new Promise(r => setTimeout(r, 250));
+      }
+      const u = Auth.getUser();
+      const adminEmail = (window.CONFIG && CONFIG.ADMIN_EMAIL || 'guillers240@gmail.com').toLowerCase();
+      if (u && u.email && u.email.toLowerCase() === adminEmail) {
+        u.role = 'admin';
+        Auth.currentUser = u;
+      }
       if (!Auth.isLoggedIn() || !Auth.isAdmin()) {
-        alert('Solo el administrador puede acceder');
-        location.href = 'index.html';
+        toast(!Auth.isLoggedIn() ? 'Debes iniciar sesión como administrador' : 'Solo guillers240@gmail.com puede acceder', 'error');
+        setTimeout(() => { location.href = 'index.html'; }, 1400);
         return;
       }
       document.getElementById('adminName').textContent = Auth.getUser().email;
       document.querySelectorAll('.admin-nav a[data-section]').forEach(a => {
-        a.addEventListener('click', e => {
-          e.preventDefault();
+        a.addEventListener('click', () => {
           document.querySelectorAll('.admin-nav a[data-section]').forEach(x => x.classList.remove('active'));
           a.classList.add('active');
           document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
           const sec = document.getElementById('sec-' + a.dataset.section);
           if (sec) sec.classList.add('active');
-          document.getElementById('sectionTitle').textContent = a.textContent.trim();
+          document.getElementById('secTitle').textContent = a.textContent.trim();
+          if (a.dataset.section === 'dashboard') renderDashboard();
           if (a.dataset.section === 'users') renderUsers();
           if (a.dataset.section === 'sellers') renderRequests();
           if (a.dataset.section === 'managers') renderManagers();
           if (a.dataset.section === 'stores') renderStores();
           if (a.dataset.section === 'orders') renderOrders();
-          if (a.dataset.section === 'dashboard') renderDashboard();
         });
       });
       renderDashboard();
     }
+
     async function renderDashboard() {
-      const stats = document.getElementById('dashStats');
-      const [users, stores, orders, reqs] = await Promise.all([
+      const [users, stores, products, orders, pending] = await Promise.all([
         sb.from('profiles').select('id', { count: 'exact', head: true }),
         sb.from('stores').select('id', { count: 'exact', head: true }),
+        sb.from('products').select('id', { count: 'exact', head: true }),
         sb.from('orders').select('id', { count: 'exact', head: true }),
         sb.from('seller_requests').select('id', { count: 'exact', head: true }).eq('status', 'pendiente'),
       ]);
-      stats.innerHTML = `
-        <div class="stat-card"><h3>Usuarios</h3><div class="num">${users.count??0}</div></div>
-        <div class="stat-card"><h3>Tiendas</h3><div class="num">${stores.count??0}</div></div>
-        <div class="stat-card"><h3>Pedidos</h3><div class="num">${orders.count??0}</div></div>
-        <div class="stat-card"><h3>Solicitudes pendientes</h3><div class="num">${reqs.count??0}</div></div>`;
+      document.getElementById('dashStats').innerHTML = [
+        ['Usuarios', users.count||0],
+        ['Tiendas', stores.count||0],
+        ['Productos', products.count||0],
+        ['Pedidos', orders.count||0],
+        ['Solicitudes pendientes', pending.count||0],
+      ].map(([h,n]) => `<div class="stat-card"><h3>${h}</h3><div class="num">${n}</div></div>`).join('');
     }
+
     async function renderUsers() {
-      const { data } = await sb.from('profiles').select('*').order('created_at', { ascending: false }).limit(200);
-      const tbody = document.getElementById('usersBody');
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin usuarios</td></tr>'; return; }
-      tbody.innerHTML = data.map(u => `<tr>
-        <td>${u.full_name||'—'}</td><td>${u.email||'—'}</td><td>${u.role||'customer'}</td>
-        <td>${u.phone||'—'}</td><td>${u.age??'—'}</td></tr>`).join('');
+      const { data } = await sb.from('profiles').select('*').order('created_at', { ascending: false }).limit(100);
+      document.getElementById('usersBody').innerHTML = (data||[]).map(u =>
+        `<tr><td>${u.full_name||'—'}</td><td>${u.email||''}</td><td>${u.role}</td><td>${u.created_at?new Date(u.created_at).toLocaleDateString('es'):'—'}</td></tr>`
+      ).join('') || '<tr><td colspan="4">Sin usuarios</td></tr>';
     }
+
     async function renderRequests() {
-      const { data } = await sb.from('seller_requests').select('*, profiles(full_name, email, age, phone)').order('created_at', { ascending: false });
-      const tbody = document.getElementById('requestsBody');
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">Sin solicitudes</td></tr>'; return; }
-      tbody.innerHTML = data.map(r => `<tr>
-        <td>${r.profiles?.full_name||'—'}<br><small>${r.profiles?.email||''}</small></td>
-        <td>${r.store_name||'—'}</td><td>${r.category||'—'}</td>
-        <td>${new Date(r.created_at).toLocaleDateString('es-CO')}</td>
-        <td>${r.status}</td>
-        <td>${r.status==='pendiente'?`
-          <button class="btn-sm btn-primary" onclick="approveSeller('${r.id}','${r.user_id}','${(r.store_name||'').replace(/'/g,'')}')">Aprobar</button>
-          <button class="btn-sm btn-danger" onclick="rejectSeller('${r.id}')">Rechazar</button>`:r.status}
-        </td></tr>`).join('');
+      const { data } = await sb.from('seller_requests').select('*, profiles(full_name,email)').order('created_at', { ascending: false });
+      document.getElementById('sellersBody').innerHTML = (data||[]).map(r =>
+        `<tr><td>${r.store_name||'—'}</td><td>${r.profiles?.full_name||r.profiles?.email||r.user_id}</td><td>${r.status}</td><td>` +
+        (r.status==='pendiente' ? `<button class="btn-sm btn-primary" onclick="approveSeller('${r.id}','${r.user_id}','${(r.store_name||'').replace(/'/g,"")}');">Aprobar</button> <button class="btn-sm btn-danger" onclick="rejectSeller('${r.id}')">Rechazar</button>` : '—') +
+        `</td></tr>`
+      ).join('') || '<tr><td colspan="4">Sin solicitudes</td></tr>';
     }
+
     async function renderManagers() {
-      const { data } = await sb.from('manager_requests').select('*, profiles(full_name, email)').order('created_at', { ascending: false });
-      const tbody = document.getElementById('managersBody');
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Sin solicitudes</td></tr>'; return; }
-      tbody.innerHTML = data.map(r => `<tr>
-        <td>${r.profiles?.full_name||'—'} (${r.profiles?.email||''})</td>
-        <td>${new Date(r.created_at).toLocaleDateString('es-CO')}</td>
-        <td>${r.status}</td>
-        <td>${r.status==='pendiente'?`
-          <button class="btn-sm btn-primary" onclick="approveManager('${r.id}','${r.user_id}')">Aprobar</button>
-          <button class="btn-sm btn-danger" onclick="rejectManager('${r.id}')">Rechazar</button>`:r.status}
-        </td></tr>`).join('');
+      const { data } = await sb.from('manager_requests').select('*, profiles(full_name,email)').order('created_at', { ascending: false });
+      document.getElementById('managersBody').innerHTML = (data||[]).map(r =>
+        `<tr><td>${r.profiles?.full_name||r.profiles?.email||r.user_id}</td><td>${r.status}</td><td>` +
+        (r.status==='pendiente' ? `<button class="btn-sm btn-primary" onclick="approveManager('${r.id}','${r.user_id}')">Aprobar</button> <button class="btn-sm btn-danger" onclick="rejectManager('${r.id}')">Rechazar</button>` : '—') +
+        `</td></tr>`
+      ).join('') || '<tr><td colspan="3">Sin solicitudes</td></tr>';
     }
+
     async function renderStores() {
-      const { data } = await sb.from('stores').select('*').order('created_at', { ascending: false });
-      const tbody = document.getElementById('storesBody');
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Sin tiendas</td></tr>'; return; }
-      tbody.innerHTML = data.map(s => `<tr>
-        <td>${s.name}</td><td>${s.slug||'—'}</td><td>${s.category||'—'}</td>
-        <td>${s.active?'Activa':'Inactiva'}</td></tr>`).join('');
+      const { data } = await sb.from('stores').select('*').order('name');
+      document.getElementById('storesBody').innerHTML = (data||[]).map(s =>
+        `<tr><td>${s.name} ${s.membership==='vip'||s.membership==='premium'?'★':s.verified?'✓':''}</td><td>${s.slug||'—'}</td><td>${s.verified?'Sí':'No'}</td><td>${s.active?'Sí':'No'}</td></tr>`
+      ).join('') || '<tr><td colspan="4">Sin tiendas</td></tr>';
     }
+
     async function renderOrders() {
       const { data } = await sb.from('orders').select('*').order('created_at', { ascending: false }).limit(100);
-      const tbody = document.getElementById('ordersBody');
-      if (!data?.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr>'; return; }
-      tbody.innerHTML = data.map(o => `<tr>
-        <td>#${String(o.id).slice(-8)}</td>
-        <td>${formatPrice(o.total)}</td>
-        <td>${o.status}</td>
-        <td>${o.payment_status||'—'}</td>
-        <td>${new Date(o.created_at).toLocaleDateString('es-CO')}</td></tr>`).join('');
+      document.getElementById('ordersBody').innerHTML = (data||[]).map(o =>
+        `<tr><td>#${String(o.id).slice(-8)}</td><td>${formatPrice(o.total)}</td><td>${o.status}</td><td>${o.payment_status||'—'}</td><td>${new Date(o.created_at).toLocaleDateString('es')}</td></tr>`
+      ).join('') || '<tr><td colspan="5">Sin pedidos</td></tr>';
     }
+
     window.approveSeller = async function(reqId, userId, storeName) {
       await sb.from('seller_requests').update({ status: 'aprobado', reviewed_at: new Date().toISOString(), reviewed_by: Auth.getUser().id }).eq('id', reqId);
       await sb.from('profiles').update({ role: 'seller' }).eq('id', userId);
@@ -206,8 +214,7 @@
         await sb.from('stores').insert({ owner_id: userId, name: storeName || 'Mi Tienda', slug, active: true });
       }
       toast('Vendedor aprobado', 'success');
-      renderRequests();
-      renderDashboard();
+      renderRequests(); renderDashboard();
     };
     window.rejectSeller = async function(reqId) {
       await sb.from('seller_requests').update({ status: 'rechazado', reviewed_at: new Date().toISOString(), reviewed_by: Auth.getUser().id }).eq('id', reqId);
@@ -225,6 +232,35 @@
       toast('Rechazado');
       renderManagers();
     };
+
+    document.getElementById('btnSendAnn')?.addEventListener('click', async () => {
+      const title = document.getElementById('annTitle')?.value?.trim();
+      const body = document.getElementById('annBody')?.value?.trim() || '';
+      if (!title) { toast('Escribe un título', 'error'); return; }
+      let image_url = null;
+      const file = document.getElementById('annImage')?.files?.[0];
+      if (file && window.DataService?.uploadImage) {
+        try { image_url = await DataService.uploadImage(file, 'announcements'); } catch (e) { console.warn(e); }
+      }
+      const { data: ann, error } = await sb.from('announcements').insert({
+        title, body, image_url, created_by: Auth.getUser().id, active: true
+      }).select().single();
+      if (error) { toast(error.message || 'Error', 'error'); return; }
+      const { data: users } = await sb.from('profiles').select('id');
+      if (users?.length) {
+        const rows = users.map(u => ({
+          user_id: u.id, title, body: body || title, type: 'announcement',
+          data: { announcement_id: ann.id, image_url }
+        }));
+        for (let i = 0; i < rows.length; i += 80) {
+          await sb.from('notifications').insert(rows.slice(i, i + 80));
+        }
+      }
+      toast('Anuncio enviado a ' + (users?.length || 0) + ' usuarios', 'success');
+      document.getElementById('annTitle').value = '';
+      document.getElementById('annBody').value = '';
+    });
+
     document.addEventListener('DOMContentLoaded', init);
   </script>
   <script src="js/admin-home.js"></script>
