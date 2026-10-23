@@ -78,6 +78,10 @@ const Auth = {
     if (!email || !password) throw new Error('Correo y contraseña son obligatorios.');
     if (password.length < 6) throw new Error('La contraseña debe tener al menos 6 caracteres.');
 
+    if (!window.sb && typeof ensureClient === 'function' && !CONFIG.DEMO_MODE) {
+      await ensureClient(8000);
+    }
+
     if (CONFIG.DEMO_MODE || !window.sb) {
       const users = JSON.parse(localStorage.getItem('mp_users') || '[]');
       if (users.find(u => String(u.email).toLowerCase() === email)) {
@@ -151,8 +155,11 @@ const Auth = {
     password = this._cleanPassword(password);
     if (!email || !password) throw new Error('Escribe correo y contraseña.');
 
+    if (!window.sb && typeof ensureClient === 'function' && !CONFIG.DEMO_MODE) {
+      await ensureClient(8000);
+    }
     if (!window.sb && !CONFIG.DEMO_MODE) {
-      throw new Error('No hay conexión con el servidor. Recarga la página.');
+      throw new Error('No hay conexión con el servidor. Recarga la página (Ctrl+F5).');
     }
 
     if (CONFIG.DEMO_MODE || !window.sb) {
@@ -209,6 +216,9 @@ const Auth = {
   },
 
   async loginWithGoogle() {
+    if (!window.sb && typeof ensureClient === 'function' && !CONFIG.DEMO_MODE) {
+      await ensureClient(5000);
+    }
     if (CONFIG.DEMO_MODE || !window.sb) {
       throw new Error('Google login no disponible. Usa email/contraseña.');
     }
