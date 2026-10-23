@@ -142,15 +142,19 @@ function openCheckout() {
     </div>
     <h3>Método de envío</h3>
     <label class="pay-option"><input type="radio" name="shipMethod" value="standard" checked>
+      <span class="co-ico"><i class="fas fa-truck"></i></span>
       <span><strong>${cfg.shipping_standard_label}</strong><br><small>${cfg.shipping_standard_days} · ${cfg.shipping_standard_price ? formatPrice(cfg.shipping_standard_price) : 'Gratis'}</small></span>
     </label>
     <label class="pay-option"><input type="radio" name="shipMethod" value="express">
+      <span class="co-ico"><i class="fas fa-shipping-fast"></i></span>
       <span><strong>${cfg.shipping_express_label}</strong><br><small>${cfg.shipping_express_days} · ${cfg.shipping_express_price ? formatPrice(cfg.shipping_express_price) : 'Gratis'}</small></span>
     </label>
     <h3>Método de pago</h3>
-    ${(cfg.payment_methods || ['transferencia']).map((m, i) => {
+    ${(cfg.payment_methods || ['transferencia', 'efectivo']).map((m, i) => {
       const labels = { transferencia: 'Transferencia / Enzona / Transfermóvil', efectivo: 'Efectivo contra entrega', tarjeta: 'Tarjeta' };
+      const icons = { transferencia: 'fa-building-columns', efectivo: 'fa-money-bill-wave', tarjeta: 'fa-credit-card' };
       return `<label class="pay-option"><input type="radio" name="payMethod" value="${m}" ${i === 0 ? 'checked' : ''}>
+        <span class="co-ico"><i class="fas ${icons[m] || 'fa-wallet'}"></i></span>
         <span><strong>${labels[m] || m}</strong></span></label>`;
     }).join('')}
     <div class="checkout-total">
@@ -173,6 +177,9 @@ function openCheckout() {
     panel.classList.add('hidden');
     document.getElementById('overlay')?.classList.add('hidden');
     switchView('perfil');
+    setTimeout(() => {
+      if (typeof openProfilePanel === 'function') openProfilePanel('panel-datos', 'profAddress');
+    }, 200);
   });
   document.getElementById('btnConfirmOrder')?.addEventListener('click', async () => {
     if (!user.address) { toast('Completa tu dirección en Mi Perfil', 'error'); return; }
