@@ -54,28 +54,28 @@ const DataService = {
 
   async getProducts(filters = {}) {
     if (!sb) return [];
-    let query = sb.from('products').select('*, stores(name, logo, slug)').eq('active', true);
-    if (filters.category) query = query.eq('category', filters.category);
-    if (filters.store_id) query = query.eq('store_id', filters.store_id);
-    if (filters.search) query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
-    if (filters.sort === 'precio-asc') query = query.order('price', { ascending: true });
-    else if (filters.sort === 'precio-desc') query = query.order('price', { ascending: false });
-    else query = query.order('created_at', { ascending: false });
-    const { data, error } = await query;
-    if (error) { console.error(error); throw error; }
+    let q = sb.from('products').select('*, stores(name, slug, logo)').eq('active', true);
+    if (filters.category) q = q.eq('category', filters.category);
+    if (filters.store_id) q = q.eq('store_id', filters.store_id);
+    if (filters.search) q = q.ilike('name', `%${filters.search}%`);
+    if (filters.sort === 'price_asc') q = q.order('price', { ascending: true });
+    else if (filters.sort === 'price_desc') q = q.order('price', { ascending: false });
+    else q = q.order('created_at', { ascending: false });
+    const { data, error } = await q;
+    if (error) throw error;
     return data || [];
   },
 
   async getProduct(id) {
     if (!sb) return null;
-    const { data, error } = await sb.from('products').select('*, stores(name, logo, slug)').eq('id', id).single();
+    const { data, error } = await sb.from('products').select('*, stores(*)').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
   },
 
   async createProduct(payload) {
     if (!sb) throw new Error('Sin Supabase');
-    const { data, error } = await sb.from('products').insert(payload).select('*, stores(name, logo)').single();
+    const { data, error } = await sb.from('products').insert(payload).select().single();
     if (error) throw error;
     return data;
   },
@@ -102,14 +102,14 @@ const DataService = {
 
   async getStore(id) {
     if (!sb) return null;
-    const { data, error } = await sb.from('stores').select('*').eq('id', id).single();
+    const { data, error } = await sb.from('stores').select('*').eq('id', id).maybeSingle();
     if (error) throw error;
     return data;
   },
 
   async getStoreBySlug(slug) {
     if (!sb) return null;
-    const { data, error } = await sb.from('stores').select('*').eq('slug', slug).eq('active', true).maybeSingle();
+    const { data, error } = await sb.from('stores').select('*').eq('slug', slug).maybeSingle();
     if (error) throw error;
     return data;
   },
@@ -137,7 +137,7 @@ const DataService = {
     if (!sb) throw new Error('Sin Supabase');
     const storeId = orderData.items?.[0]?.store_id || null;
     const { data: order, error } = await sb.from('orders').insert({
-      user_id: orderData.user_id,
+      user_id: orderData.user_id || null,
       total: orderData.total,
       status: 'pendiente',
       shipping_address: orderData.shipping_address,
@@ -146,6 +146,7 @@ const DataService = {
       payment_status: 'pendiente',
       payer_name: orderData.payer_name || null,
       payer_phone: orderData.payer_phone || null,
+      guest_email: orderData.guest_email || null,
     }).select().single();
     if (error) throw error;
 
@@ -165,7 +166,8 @@ const DataService = {
         await sb.from('notifications').insert({
           user_id: store.owner_id,
           title: '¡Nuevo pedido!',
-          body: `Pedido #${String(order.id).slice(-6)} por $${Number(order.total).toLocaleString()}`,
+          body: `Pedido #${String(order.id).slice(-6)} por $${Number(order.total).toLocaleString()}` +
+            (orderData.payer_name ? ` · ${orderData.payer_name}` : ''),
           type: 'order',
           data: { order_id: order.id },
         });
@@ -177,61 +179,53 @@ const DataService = {
   async getProfile(userId) {
     if (!sb) return null;
     const { data, error } = await sb.from('profiles').select('*').eq('id', userId).maybeSingle();
-    if (error && error.code !== 'PGRST116') throw error;
+    if (error) throw error;
     return data;
   },
 
   async updateProfile(userId, updates) {
     if (!sb) throw new Error('Sin Supabase');
-    const { data, error } = await sb.from('profiles').upsert({ id: userId, ...updates, updated_at: new Date().toISOString() }).select().single();
+    const { data, error } = await sb.from('profiles').update(updates).eq('id', userId).select().single();
     if (error) throw error;
     return data;
   },
 
   async requestSeller(userId, data) {
     if (!sb) throw new Error('Sin Supabase');
-    const { data: req, error } = await sb.from('seller_requests').upsert({
+    const { data: row, error } = await sb.from('seller_requests').upsert({
       user_id: userId,
       status: 'pendiente',
       ...data,
     }, { onConflict: 'user_id' }).select().single();
     if (error) throw error;
-    return req;
+    return row;
   },
 
   async getSellerRequest(userId) {
     if (!sb) return null;
-    const { data, error } = await sb.from('seller_requests').select('*').eq('user_id', userId).maybeSingle();
-    if (error) throw error;
+    const { data } = await sb.from('seller_requests').select('*').eq('user_id', userId).maybeSingle();
     return data;
   },
 
   async getConversations(userId) {
     if (!sb) return [];
-    const { data: asUser } = await sb.from('conversations')
-      .select('*, stores(name, logo), messages(content, created_at, read, sender_id)')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: false });
-    return asUser || [];
+    const { data, error } = await sb.from('conversations').select('*, stores(name, logo)').eq('user_id', userId).order('updated_at', { ascending: false });
+    if (error) throw error;
+    return (data || []).map(c => ({ ...c, name: c.stores?.name, logo: c.stores?.logo }));
   },
 
   async getOrCreateConversation(userId, storeId) {
     if (!sb) throw new Error('Sin Supabase');
-    const { data: existing } = await sb.from('conversations')
-      .select('*').eq('user_id', userId).eq('store_id', storeId).maybeSingle();
+    const { data: existing } = await sb.from('conversations').select('*').eq('user_id', userId).eq('store_id', storeId).maybeSingle();
     if (existing) return existing;
-    const { data, error } = await sb.from('conversations')
-      .insert({ user_id: userId, store_id: storeId }).select().single();
+    const { data, error } = await sb.from('conversations').insert({ user_id: userId, store_id: storeId }).select().single();
     if (error) throw error;
     return data;
   },
 
   async getMessages(conversationId) {
     if (!sb) return [];
-    const { data, error } = await sb.from('messages')
-      .select('*')
-      .eq('conversation_id', conversationId)
-      .order('created_at', { ascending: true });
+    const { data, error } = await sb.from('messages').select('*').eq('conversation_id', conversationId).order('created_at', { ascending: true });
     if (error) throw error;
     return data || [];
   },
@@ -262,25 +256,13 @@ const DataService = {
   subscribeMessages(conversationId, onMessage) {
     if (!sb) return null;
     return sb.channel(`messages:${conversationId}`)
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`,
-      }, (payload) => onMessage(payload.new))
-      .on('postgres_changes', {
-        event: 'DELETE',
-        schema: 'public',
-        table: 'messages',
-        filter: `conversation_id=eq.${conversationId}`,
-      }, (payload) => onMessage({ deleted: true, id: payload.old?.id }))
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `conversation_id=eq.${conversationId}` }, (payload) => onMessage(payload.new))
       .subscribe();
   },
 
   async getNotifications(userId) {
     if (!sb) return [];
-    const { data, error } = await sb.from('notifications')
-      .select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(50);
+    const { data, error } = await sb.from('notifications').select('*').eq('user_id', userId).order('created_at', { ascending: false }).limit(50);
     if (error) throw error;
     return data || [];
   },
