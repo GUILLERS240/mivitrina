@@ -27,7 +27,7 @@
     const half = r - full >= 0.5 ? 1 : 0;
     let h = '<span class="stars-row" title="' + r.toFixed(1) + '">';
     for (let i = 0; i < 5; i++) {
-      if (i < full)) h += '<i class="fas fa-star star-on"></i>';
+      if (i < full) h += '<i class="fas fa-star star-on"></i>';
       else if (i === full && half) h += '<i class="fas fa-star-half-alt star-on"></i>';
       else h += '<i class="far fa-star star-off"></i>';
     }
