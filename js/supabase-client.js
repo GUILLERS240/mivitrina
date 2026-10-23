@@ -161,16 +161,20 @@ const DataService = {
     if (itemsErr) throw itemsErr;
 
     if (storeId) {
-      const { data: store } = await sb.from('stores').select('owner_id').eq('id', storeId).single();
-      if (store?.owner_id) {
-        await sb.from('notifications').insert({
-          user_id: store.owner_id,
-          title: '¡Nuevo pedido!',
-          body: `Pedido #${String(order.id).slice(-6)} por $${Number(order.total).toLocaleString()}` +
-            (orderData.payer_name ? ` · ${orderData.payer_name}` : ''),
-          type: 'order',
-          data: { order_id: order.id },
-        });
+      try {
+        const { data: store } = await sb.from('stores').select('owner_id').eq('id', storeId).single();
+        if (store?.owner_id) {
+          await sb.from('notifications').insert({
+            user_id: store.owner_id,
+            title: '¡Nuevo pedido!',
+            body: `Pedido #${String(order.id).slice(-6)} por $${Number(order.total).toLocaleString()}` +
+              (orderData.payer_name ? ` · ${orderData.payer_name}` : ''),
+            type: 'order',
+            data: { order_id: order.id },
+          });
+        }
+      } catch (e) {
+        console.warn('Notificación pedido:', e);
       }
     }
     return order;
