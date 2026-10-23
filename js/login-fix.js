@@ -56,6 +56,7 @@
       if (typeof closeAuthModal === 'function') closeAuthModal();
       if (typeof updateAuthUI === 'function') updateAuthUI();
       if (typeof toast === 'function') toast('Bienvenido', 'success');
+      if (typeof window.onAuthChange === 'function') window.onAuthChange();
     } catch (err) {
       console.warn('[login-fix]', err);
       showLoginError(err.message || 'Error al iniciar sesión');
@@ -90,10 +91,29 @@
     });
   }
 
+  function loadSocial() {
+    if (!document.querySelector('link[href="css/social.css"]')) {
+      var l = document.createElement('link');
+      l.rel = 'stylesheet';
+      l.href = 'css/social.css';
+      document.head.appendChild(l);
+    }
+    if (!document.querySelector('script[src="js/social-features.js"]')) {
+      var s = document.createElement('script');
+      s.src = 'js/social-features.js';
+      s.defer = true;
+      document.body.appendChild(s);
+    }
+  }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(wire, 50));
+    document.addEventListener('DOMContentLoaded', function () {
+      setTimeout(wire, 50);
+      loadSocial();
+    });
   } else {
     setTimeout(wire, 50);
+    loadSocial();
   }
-  window.addEventListener('load', () => setTimeout(wire, 100));
+  window.addEventListener('load', function () { setTimeout(wire, 100); });
 })();
